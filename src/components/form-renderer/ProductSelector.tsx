@@ -294,9 +294,18 @@ export function ProductSelector({
             </span>
           )}
           {withPrice && showPrice && v.price != null && (
-            <span className="shrink-0 text-xs text-muted-foreground">
-              {formatPrice(v.price, p.currency ?? currency)}
-            </span>
+            <div className="shrink-0 text-right">
+              <div className="text-xs text-muted-foreground">
+                {formatPrice(v.price, p.currency ?? currency)}
+              </div>
+
+              {(v.serviceFee ?? 0) > 0 && (
+                <div className="text-[10px] text-muted-foreground">
+                  + {formatPrice(v.serviceFee ?? 0, p.currency ?? currency)}{" "}
+                  cargo por servicio
+                </div>
+              )}
+            </div>
           )}
         </div>
         {renderControls(p, v, qty)}
@@ -409,7 +418,20 @@ export function ProductSelector({
           <p className="text-xs text-muted-foreground">Agotado</p>
         ) : (
           priceLabel && (
-            <p className="mt-0.5 text-sm text-foreground">{priceLabel}</p>
+            <>
+              <p className="mt-0.5 text-sm text-foreground">{priceLabel}</p>
+
+              {p.variants.some((v) => (v.serviceFee ?? 0) > 0) && (
+                <p className="text-xs text-muted-foreground">
+                  +{" "}
+                  {formatPrice(
+                    Math.max(...p.variants.map((v) => v.serviceFee ?? 0)),
+                    p.currency ?? currency,
+                  )}{" "}
+                  cargo por servicio
+                </p>
+              )}
+            </>
           )
         )}
 
