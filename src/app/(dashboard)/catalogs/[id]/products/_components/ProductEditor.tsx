@@ -329,8 +329,8 @@ export function ProductEditor({
       {tab === "variants" && (
         <div className="space-y-4">
           {/* Ayuda: cada variante es una combinación vendible del producto (una
-            talla, un color, etc.). Un producto sin variaciones igual necesita al
-            menos una variante con su precio y stock. */}
+              talla, un color, etc.). Un producto sin variaciones igual necesita al
+              menos una variante con su precio y stock. */}
           <div className="space-y-1 rounded-md bg-subtle/50 p-3 text-xs text-muted-foreground">
             <p className="font-medium text-foreground">
               Cómo cargar las variantes
