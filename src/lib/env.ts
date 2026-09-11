@@ -45,6 +45,7 @@ if (isServer) {
       "Invalid server env vars:",
       parsed.error.flatten().fieldErrors,
     );
+    throw new Error("Invalid server environment variables");
   }
 
   serverData = parsed.data;

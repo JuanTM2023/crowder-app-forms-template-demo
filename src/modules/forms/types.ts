@@ -19,6 +19,7 @@ export type FormListItem = {
   groupCount: number;
   transactionGroupCount: number;
   itemGroupCount: number;
+  producerName?: string | null;
 };
 
 export type CreateFormInput = {
