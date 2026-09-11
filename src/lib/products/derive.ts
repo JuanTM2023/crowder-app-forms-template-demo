@@ -202,11 +202,11 @@ export function derivePartnerItems(
 
       const serviceFee = round2(variant.serviceFee ?? 0);
 
-      const totalPrice = round2(basePrice + serviceFee);
       const quantity = Math.max(1, pick.quantity ?? 1);
 
       // Cada unidad = un PartnerItem de quantity: 1 (sección 9.2).
       for (let unitIndex = 0; unitIndex < quantity; unitIndex++) {
+        // Producto
         items.push({
           uuid: deterministicItemUuid({
             formId: src.formId,
@@ -219,10 +219,30 @@ export function derivePartnerItems(
           }),
           type: "STORE_PRODUCT",
           description,
-          price: totalPrice,
+          price: basePrice,
           quantity: 1,
           refundable: product.refundable,
         });
+
+        // Cargo por servicio
+        if (serviceFee > 0) {
+          items.push({
+            uuid: deterministicItemUuid({
+              formId: src.formId,
+              groupId: src.groupId,
+              itemUuid: src.itemUuid,
+              questionId: src.questionId,
+              productId: pick.productId,
+              variantId: `${pick.variantId}-fee`,
+              unitIndex,
+            }),
+            type: "STORE_PRODUCT",
+            description: "Cargo por servicio",
+            price: serviceFee,
+            quantity: 1,
+            refundable: false,
+          });
+        }
       }
     }
   }
