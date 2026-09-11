@@ -148,9 +148,7 @@ export function ProductEditor({
     product?.status ?? "active",
   );
   const [refundable, setRefundable] = useState(product?.refundable ?? true);
-  const [serviceFee, setServiceFee] = useState(
-    String(product?.serviceFee ?? 0),
-  );
+
   const [collectionIds, setCollectionIds] = useState<string[]>(
     product?.collectionIds ?? [],
   );
@@ -179,7 +177,7 @@ export function ProductEditor({
     images,
     status,
     refundable,
-    serviceFee: Number(serviceFee || 0),
+    serviceFee: 0,
     collectionIds,
     variants: variants.map((v) => ({
       id: v.id || undefined,
@@ -296,6 +294,7 @@ export function ProductEditor({
           </div>
         </div>
 
+        {/*
         <div className="space-y-1">
           <Label>Cargo por Servicio</Label>
 
@@ -307,6 +306,7 @@ export function ProductEditor({
             disabled={readOnly}
           />
         </div>
+        */}
       </Card>
 
       <TabNav
