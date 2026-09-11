@@ -105,7 +105,6 @@ export function ProductSelector({
   // Cantidad de tickets (ya resuelta por scope) para el modo `perTickets`.
   ticketCount?: number;
 }) {
-  console.log("PRODUCT SELECTOR", products);
   // min/max EFECTIVOS: en modo `fixed` son los configurados; en `perTickets` se
   // derivan de la cantidad de tickets (1 producto por entrada).
   const { min, max } = resolveQuantityBounds(config, ticketCount);
@@ -153,7 +152,6 @@ export function ProductSelector({
   });
 
   const emit = (next: ProductPick[]) => {
-    console.log("EMIT PICKS", JSON.stringify(next, null, 2));
     onChange(single ? (next[0] ?? undefined) : next);
   };
 
@@ -172,7 +170,6 @@ export function ProductSelector({
   // El tope de la línea es el stock de la variante (`available`, null = ilimitado);
   // el tope global es el `max` de la pregunta.
   const setQty = (p: RenderProduct, v: RenderVariant, qty: number) => {
-    console.log("SET QTY", p.title, v.title, qty);
     const currentQty = qtyOf(p.id, v.id);
     // Clamp al stock disponible de la variante (optimista, sin holds).
     const target = v.available == null ? qty : Math.min(qty, v.available);
@@ -353,8 +350,6 @@ export function ProductSelector({
 
   // Listado: fila horizontal (miniatura a la izquierda, variantes a la derecha).
   const renderProductRow = (p: RenderProduct) => {
-    console.log("RENDER PRODUCT", p.title);
-
     const soldOut = !p.variants.some((v) => v.sellable);
     return (
       <div

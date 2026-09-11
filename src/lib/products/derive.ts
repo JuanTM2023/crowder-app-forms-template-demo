@@ -237,7 +237,5 @@ export function derivePartnerItems(
     });
   }
 
-  console.log("PARTNER ITEMS", items);
-
   return { items, errors };
 }

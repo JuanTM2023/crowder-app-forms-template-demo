@@ -72,10 +72,6 @@ type Phase =
   | { kind: "fatal"; code: ErrorCode; title: string; message: string };
 
 export function EmbedWizard(props: Props) {
-  if (typeof window !== "undefined") {
-    console.log("EMBED WIZARD MONTADO V2");
-  }
-
   const previewMode = !!props.previewContext;
   const [phase, setPhase] = useState<Phase>(() =>
     props.previewContext
@@ -128,8 +124,6 @@ export function EmbedWizard(props: Props) {
   // sin productos los items van [] y se emite una sola vez (igual que antes).
   const emitSelected = useCallback(
     (partnerItems: PartnerItem[]) => {
-      console.log("SELECTED ITEMS", JSON.stringify(partnerItems, null, 2));
-
       const sig = JSON.stringify(partnerItems);
       if (selectedSigRef.current === sig) return;
       selectedSigRef.current = sig;
@@ -231,12 +225,6 @@ export function EmbedWizard(props: Props) {
     }
 
     function handler(event: MessageEvent) {
-      console.log("MESSAGE RECEIVED");
-      console.log("ORIGIN:", event.origin);
-      console.log("DATA:", event.data);
-      console.log("ALLOWED ORIGINS:");
-      console.log(props.parentOrigins);
-
       const data =
         event.data && typeof event.data === "object"
           ? (event.data as { type?: unknown; status?: unknown })
@@ -244,21 +232,16 @@ export function EmbedWizard(props: Props) {
       // Caso 3: si el origin no matchea, ignoramos silenciosamente y seguimos
       // esperando al parent legítimo.
       if (!props.parentOrigins.includes(event.origin)) {
-        console.log("ORIGIN REJECTED:", event.origin);
         return;
       }
 
       if (!data) {
-        console.log("NO DATA");
         return;
       }
 
       if (data.status !== "context") {
-        console.log("NOT CONTEXT:", data.status);
         return;
       }
-
-      console.log("CONTEXT ACCEPTED");
 
       parentOriginRef.current = event.origin;
       if (!validateContextShape(data)) {
@@ -272,8 +255,6 @@ export function EmbedWizard(props: Props) {
       acceptContext(data, event.origin);
     }
     window.addEventListener("message", handler);
-
-    console.log("######## READY ########");
 
     emit({ type: "interaction", status: "ready" });
 
@@ -385,11 +366,6 @@ export function EmbedWizard(props: Props) {
     for (const list of Object.values(props.productLists ?? {})) {
       for (const p of list) lookup.set(p.id, p);
     }
-
-    console.log(
-      "PRODUCT LOOKUP",
-      JSON.stringify([...lookup.values()], null, 2),
-    );
 
     return lookup;
   }, [props.productLists]);

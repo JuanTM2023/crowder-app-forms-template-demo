@@ -38,8 +38,6 @@ export default async function EmbedFormPage({
       resolved[i].map(toRenderProduct);
   });
 
-  console.log("PRODUCT LISTS", JSON.stringify(productLists, null, 2));
-
   const themeCss = embedThemeStyle(published.form.theme ?? cfg?.theme ?? null);
 
   return (
