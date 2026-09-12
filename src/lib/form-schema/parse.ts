@@ -107,6 +107,10 @@ const questionSchema = z
         allowedSectors: z.array(z.string()).optional(),
         allowedRates: z.array(z.string()).optional(),
 
+        eligibilityMode: z
+          .enum(["none", "filter", "filter_and_limit"])
+          .optional(),
+
         min: z.number().int().min(0).optional(),
         // Salvaguarda anti-abuso (ya no el "1–10" del protocolo, que Crowder acepta
         // superar): cota alta al máximo configurable.
