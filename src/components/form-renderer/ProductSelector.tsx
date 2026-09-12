@@ -144,6 +144,18 @@ export function ProductSelector({
 
   const eligibilityMode = config?.eligibilityMode ?? "none";
 
+  console.log("eligibilityMode", eligibilityMode);
+  console.log("eligibleTickets", eligibleTickets);
+
+  products.forEach((p) => {
+    p.variants.forEach((v) => {
+      console.log("variant", {
+        title: v.title,
+        options: v.options,
+      });
+    });
+  });
+
   // Productos con muchas variantes colapsan la lista: por defecto solo se ven
   // las variantes ya agregadas + un botón para desplegar el resto.
   const [expandedByProduct, setExpandedByProduct] = useState<
