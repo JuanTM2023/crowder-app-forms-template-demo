@@ -361,6 +361,11 @@ export function ProductSelector({
   // el resto; expandida, muestra todas con un botón para volver a ocultar.
   const renderVariantSection = (p: RenderProduct, withPrice: boolean) => {
     const visibleVariants = p.variants.filter((v) => {
+      console.log("VARIANT DEBUG", {
+        title: v.title,
+        options: v.options,
+      });
+
       if (eligibilityMode === "none") {
         return true;
       }
@@ -378,6 +383,12 @@ export function ProductSelector({
       }
 
       if (eligibilityMode === "filter_and_limit") {
+        console.log("LIMIT CHECK", {
+          variant: v.title,
+          options: v.options,
+          eligibleTickets,
+        });
+
         const sector = v.options?.Sector ?? "";
         const rate = v.options?.Tarifa ?? "";
 
