@@ -1,35 +1,35 @@
-"use client"
+"use client";
 
-import { useMemo, useState } from "react"
-import type { ZodError } from "zod"
+import { useMemo, useState } from "react";
+import type { ZodError } from "zod";
 
-import { Button } from "@/components/Button"
-import { Input } from "@/components/Input"
-import { Label } from "@/components/Label"
-import { Checkbox } from "@/components/Checkbox"
-import { Textarea } from "@/components/Textarea"
+import { Button } from "@/components/Button";
+import { Input } from "@/components/Input";
+import { Label } from "@/components/Label";
+import { Checkbox } from "@/components/Checkbox";
+import { Textarea } from "@/components/Textarea";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/Select"
+} from "@/components/Select";
 import {
   RadioCardGroup,
   RadioCardIndicator,
   RadioCardItem,
-} from "@/components/RadioCardGroup"
-import { answersSchemaForGroup } from "@/lib/form-schema"
-import { cx } from "@/lib/utils"
-import type { FormGroup, FormQuestion } from "@/lib/db/schema"
-import type { RenderProduct } from "@/lib/products/types"
+} from "@/components/RadioCardGroup";
+import { answersSchemaForGroup } from "@/lib/form-schema";
+import { cx } from "@/lib/utils";
+import type { FormGroup, FormQuestion } from "@/lib/db/schema";
+import type { RenderProduct } from "@/lib/products/types";
 
-import { MarkdownLite } from "./MarkdownLite"
-import { ProductSelector } from "./ProductSelector"
+import { MarkdownLite } from "./MarkdownLite";
+import { ProductSelector } from "./ProductSelector";
 
-type Answers = Record<string, unknown>
-type FieldErrors = Record<string, string>
+type Answers = Record<string, unknown>;
+type FieldErrors = Record<string, string>;
 
 const INPUT_TYPE_BY_QUESTION: Partial<
   Record<FormQuestion["type"], React.HTMLInputTypeAttribute>
@@ -42,9 +42,9 @@ const INPUT_TYPE_BY_QUESTION: Partial<
   time: "time",
   country: "text",
   document_id: "text",
-}
+};
 
-type Variant = "default" | "embed"
+type Variant = "default" | "embed";
 
 export function FormRenderer({
   group,
@@ -59,51 +59,57 @@ export function FormRenderer({
   productLists,
   currency,
   ticketCount,
+  eligibleTickets,
+  sectorName,
+  rateName,
 }: {
-  group: FormGroup
-  initialAnswers?: Answers
-  onChange?: (answers: Answers) => void
-  onSubmit: (answers: Answers) => void | Promise<void>
-  submitLabel?: string
-  formId?: string
-  omitHeader?: boolean
-  omitSubmit?: boolean
-  variant?: Variant
+  group: FormGroup;
+  initialAnswers?: Answers;
+  onChange?: (answers: Answers) => void;
+  onSubmit: (answers: Answers) => void | Promise<void>;
+  submitLabel?: string;
+  formId?: string;
+  omitHeader?: boolean;
+  omitSubmit?: boolean;
+  variant?: Variant;
   // Listados resueltos por questionId para preguntas `product` (definition sección 8).
-  productLists?: Record<string, RenderProduct[]>
-  currency?: string | null
+  productLists?: Record<string, RenderProduct[]>;
+  currency?: string | null;
   // Cantidad de tickets ya resuelta por scope (para preguntas `product` en modo
   // `perTickets`). undefined = sin contexto (validación estructural laxa).
-  ticketCount?: number
+  ticketCount?: number;
+  eligibleTickets?: Record<string, number>;
+  sectorName?: string;
+  rateName?: string;
 }) {
-  const [answers, setAnswers] = useState<Answers>(initialAnswers ?? {})
-  const [errors, setErrors] = useState<FieldErrors>({})
-  const [submitting, setSubmitting] = useState(false)
+  const [answers, setAnswers] = useState<Answers>(initialAnswers ?? {});
+  const [errors, setErrors] = useState<FieldErrors>({});
+  const [submitting, setSubmitting] = useState(false);
 
   const schema = useMemo(
     () => answersSchemaForGroup(group, { ticketCount }),
     [group, ticketCount],
-  )
+  );
 
   const visibleQuestions = useMemo(
     () => group.questions.filter((q) => isVisible(q, answers)),
     [group, answers],
-  )
+  );
 
   function setField(id: string, value: unknown) {
     // `setField` solo corre desde event handlers, así que `answers` del closure
     // ya es el valor commiteado. Computamos `next` acá (no dentro del updater de
     // setAnswers) para no disparar el `onChange` del padre durante el render de
     // este componente — eso causaba "Cannot update a component while rendering".
-    const next = { ...answers, [id]: value }
-    setAnswers(next)
-    onChange?.(next)
+    const next = { ...answers, [id]: value };
+    setAnswers(next);
+    onChange?.(next);
     if (errors[id]) {
       setErrors((prev) => {
-        const nextErrors = { ...prev }
-        delete nextErrors[id]
-        return nextErrors
-      })
+        const nextErrors = { ...prev };
+        delete nextErrors[id];
+        return nextErrors;
+      });
     }
   }
 
@@ -114,63 +120,63 @@ export function FormRenderer({
   // but only when it has content — empty fields stay quiet to avoid yelling
   // "required" the moment focus shifts away.
   function validateField(id: string) {
-    if (variant !== "embed") return
-    const v = answers[id]
+    if (variant !== "embed") return;
+    const v = answers[id];
     const empty =
       v == null ||
       (typeof v === "string" && v.length === 0) ||
-      (Array.isArray(v) && v.length === 0)
+      (Array.isArray(v) && v.length === 0);
     if (empty) {
       if (errors[id]) {
         setErrors((prev) => {
-          const next = { ...prev }
-          delete next[id]
-          return next
-        })
+          const next = { ...prev };
+          delete next[id];
+          return next;
+        });
       }
-      return
+      return;
     }
-    const result = schema.safeParse(answers)
+    const result = schema.safeParse(answers);
     if (result.success) {
       if (errors[id]) {
         setErrors((prev) => {
-          const next = { ...prev }
-          delete next[id]
-          return next
-        })
+          const next = { ...prev };
+          delete next[id];
+          return next;
+        });
       }
-      return
+      return;
     }
-    const issue = result.error.issues.find((i) => i.path[0] === id)
+    const issue = result.error.issues.find((i) => i.path[0] === id);
     if (issue) {
-      setErrors((prev) => ({ ...prev, [id]: issue.message }))
+      setErrors((prev) => ({ ...prev, [id]: issue.message }));
     } else if (errors[id]) {
       setErrors((prev) => {
-        const next = { ...prev }
-        delete next[id]
-        return next
-      })
+        const next = { ...prev };
+        delete next[id];
+        return next;
+      });
     }
   }
 
   async function handleSubmit(e: React.FormEvent) {
-    e.preventDefault()
-    setSubmitting(true)
+    e.preventDefault();
+    setSubmitting(true);
     try {
-      const payload: Answers = {}
+      const payload: Answers = {};
       for (const q of visibleQuestions) {
-        if (q.type === "info") continue
-        if (q.id in answers) payload[q.id] = answers[q.id]
+        if (q.type === "info") continue;
+        if (q.id in answers) payload[q.id] = answers[q.id];
       }
-      const result = schema.safeParse(payload)
+      const result = schema.safeParse(payload);
       if (!result.success) {
-        setErrors(flattenZodErrors(result.error))
-        return
+        setErrors(flattenZodErrors(result.error));
+        return;
       }
-      setErrors({})
-      await onSubmit(result.data as Answers)
+      setErrors({});
+      await onSubmit(result.data as Answers);
     } finally {
-      setSubmitting(false)
+      setSubmitting(false);
     }
   }
 
@@ -208,6 +214,9 @@ export function FormRenderer({
             products={productLists?.[q.id]}
             currency={currency}
             ticketCount={ticketCount}
+            eligibleTickets={eligibleTickets}
+            sectorName={sectorName}
+            rateName={rateName}
           />
         ))}
       </div>
@@ -220,7 +229,7 @@ export function FormRenderer({
         </div>
       )}
     </form>
-  )
+  );
 }
 
 const FLOATING_LABEL_TYPES: ReadonlySet<FormQuestion["type"]> = new Set([
@@ -235,7 +244,7 @@ const FLOATING_LABEL_TYPES: ReadonlySet<FormQuestion["type"]> = new Set([
   "country",
   "document_id",
   "dropdown",
-])
+]);
 
 // In the embed 2-column grid, these types take the full row because their
 // content doesn't fit comfortably in a half-width column.
@@ -247,22 +256,22 @@ const EMBED_FULL_WIDTH_TYPES: ReadonlySet<FormQuestion["type"]> = new Set([
   "consent",
   "info",
   "product",
-])
+]);
 
 function isFilledValue(v: unknown): boolean {
-  if (v == null) return false
-  if (typeof v === "string") return v.length > 0
-  if (Array.isArray(v)) return v.length > 0
-  return true
+  if (v == null) return false;
+  if (typeof v === "string") return v.length > 0;
+  if (Array.isArray(v)) return v.length > 0;
+  return true;
 }
 
 function RequiredMark({ required }: { required?: boolean }) {
-  if (!required) return null
+  if (!required) return null;
   return (
     <span className="ml-1 text-destructive" aria-hidden>
       *
     </span>
-  )
+  );
 }
 
 function QuestionField({
@@ -275,20 +284,26 @@ function QuestionField({
   products,
   currency,
   ticketCount,
+  eligibleTickets,
+  sectorName,
+  rateName,
 }: {
-  question: FormQuestion
-  value: unknown
-  error?: string
-  onChange: (v: unknown) => void
-  onBlur?: () => void
-  variant: Variant
-  products?: RenderProduct[]
-  currency?: string | null
-  ticketCount?: number
+  question: FormQuestion;
+  value: unknown;
+  error?: string;
+  onChange: (v: unknown) => void;
+  onBlur?: () => void;
+  variant: Variant;
+  products?: RenderProduct[];
+  currency?: string | null;
+  ticketCount?: number;
+  eligibleTickets?: Record<string, number>;
+  sectorName?: string;
+  rateName?: string;
 }) {
-  const id = `q-${question.id}`
+  const id = `q-${question.id}`;
   const embedFull =
-    variant === "embed" && EMBED_FULL_WIDTH_TYPES.has(question.type)
+    variant === "embed" && EMBED_FULL_WIDTH_TYPES.has(question.type);
 
   if (question.type === "info") {
     return (
@@ -300,15 +315,12 @@ function QuestionField({
       >
         <MarkdownLite>{question.label}</MarkdownLite>
         {question.help && (
-          <MarkdownLite
-            as="p"
-            className="mt-1 text-xs text-muted-foreground"
-          >
+          <MarkdownLite as="p" className="mt-1 text-xs text-muted-foreground">
             {question.help}
           </MarkdownLite>
         )}
       </div>
-    )
+    );
   }
 
   // Consent: the checkbox already renders its label text alongside it, so
@@ -324,12 +336,10 @@ function QuestionField({
           onBlur={onBlur}
           invalid={!!error}
           variant={variant}
+          eligibleTickets={eligibleTickets}
         />
         {question.help && (
-          <MarkdownLite
-            as="p"
-            className="text-xs text-muted-foreground"
-          >
+          <MarkdownLite as="p" className="text-xs text-muted-foreground">
             {question.help}
           </MarkdownLite>
         )}
@@ -339,13 +349,13 @@ function QuestionField({
           </p>
         )}
       </div>
-    )
+    );
   }
 
   // Embed variant: floating-label pattern for text-like fields and the
   // dropdown. Choice-style questions render below without the wrapper.
   if (variant === "embed" && FLOATING_LABEL_TYPES.has(question.type)) {
-    const filled = isFilledValue(value)
+    const filled = isFilledValue(value);
     return (
       <div
         data-embed-field
@@ -360,12 +370,9 @@ function QuestionField({
           onBlur={onBlur}
           invalid={!!error}
           variant={variant}
+          eligibleTickets={eligibleTickets}
         />
-        <Label
-          htmlFor={id}
-          data-embed-label
-          className="text-foreground"
-        >
+        <Label htmlFor={id} data-embed-label className="text-foreground">
           <MarkdownLite>{question.label}</MarkdownLite>
           <RequiredMark required={question.required} />
         </Label>
@@ -379,16 +386,12 @@ function QuestionField({
           </MarkdownLite>
         )}
         {error && (
-          <p
-            data-embed-error
-            className="text-xs text-destructive"
-            role="alert"
-          >
+          <p data-embed-error className="text-xs text-destructive" role="alert">
             {error}
           </p>
         )}
       </div>
-    )
+    );
   }
 
   return (
@@ -398,10 +401,7 @@ function QuestionField({
         <RequiredMark required={question.required} />
       </Label>
       {question.help && (
-        <MarkdownLite
-          as="p"
-          className="text-xs text-muted-foreground"
-        >
+        <MarkdownLite as="p" className="text-xs text-muted-foreground">
           {question.help}
         </MarkdownLite>
       )}
@@ -416,6 +416,9 @@ function QuestionField({
         products={products}
         currency={currency}
         ticketCount={ticketCount}
+        eligibleTickets={eligibleTickets}
+        sectorName={sectorName}
+        rateName={rateName}
       />
       {error && (
         <p className="text-xs text-destructive" role="alert">
@@ -423,7 +426,7 @@ function QuestionField({
         </p>
       )}
     </div>
-  )
+  );
 }
 
 function Field({
@@ -437,23 +440,29 @@ function Field({
   products,
   currency,
   ticketCount,
+  eligibleTickets,
+  sectorName,
+  rateName,
 }: {
-  id: string
-  question: FormQuestion
-  value: unknown
-  onChange: (v: unknown) => void
-  onBlur?: () => void
-  invalid: boolean
-  variant: Variant
-  products?: RenderProduct[]
-  currency?: string | null
-  ticketCount?: number
+  id: string;
+  question: FormQuestion;
+  value: unknown;
+  onChange: (v: unknown) => void;
+  onBlur?: () => void;
+  invalid: boolean;
+  variant: Variant;
+  products?: RenderProduct[];
+  currency?: string | null;
+  ticketCount?: number;
+  eligibleTickets?: Record<string, number>;
+  sectorName?: string;
+  rateName?: string;
 }) {
-  const ariaInvalid = invalid || undefined
+  const ariaInvalid = invalid || undefined;
   // Embed floating-label needs a non-empty placeholder so the input never
   // visually collapses while the label is in its resting position.
   const placeholder =
-    question.placeholder ?? (variant === "embed" ? " " : undefined)
+    question.placeholder ?? (variant === "embed" ? " " : undefined);
 
   if (question.type === "long_text") {
     return (
@@ -466,7 +475,7 @@ function Field({
         onChange={(e) => onChange(e.target.value)}
         onBlur={onBlur}
       />
-    )
+    );
   }
 
   if (question.type === "number") {
@@ -478,15 +487,15 @@ function Field({
         value={value == null ? "" : String(value)}
         aria-invalid={ariaInvalid}
         onChange={(e) => {
-          const v = e.target.value
-          onChange(v === "" ? undefined : Number(v))
+          const v = e.target.value;
+          onChange(v === "" ? undefined : Number(v));
         }}
         onBlur={onBlur}
       />
-    )
+    );
   }
 
-  const inputType = INPUT_TYPE_BY_QUESTION[question.type]
+  const inputType = INPUT_TYPE_BY_QUESTION[question.type];
   if (inputType) {
     return (
       <Input
@@ -498,7 +507,7 @@ function Field({
         onChange={(e) => onChange(e.target.value)}
         onBlur={onBlur}
       />
-    )
+    );
   }
 
   switch (question.type) {
@@ -507,7 +516,7 @@ function Field({
         return (
           <div role="radiogroup" className="flex flex-col gap-2">
             {(question.options ?? []).map((opt) => {
-              const checked = value === opt.value
+              const checked = value === opt.value;
               return (
                 <label
                   key={opt.value}
@@ -523,10 +532,10 @@ function Field({
                   />
                   <span>{opt.label}</span>
                 </label>
-              )
+              );
             })}
           </div>
-        )
+        );
       }
       return (
         <RadioCardGroup
@@ -545,7 +554,7 @@ function Field({
             </RadioCardItem>
           ))}
         </RadioCardGroup>
-      )
+      );
     }
     case "dropdown": {
       return (
@@ -569,15 +578,15 @@ function Field({
             ))}
           </SelectContent>
         </Select>
-      )
+      );
     }
     case "multiple_choice": {
-      const arr = Array.isArray(value) ? (value as string[]) : []
+      const arr = Array.isArray(value) ? (value as string[]) : [];
       if (variant === "embed") {
         return (
           <div className="flex flex-col gap-2">
             {(question.options ?? []).map((opt) => {
-              const checked = arr.includes(opt.value)
+              const checked = arr.includes(opt.value);
               return (
                 <label
                   key={opt.value}
@@ -586,21 +595,21 @@ function Field({
                   <Checkbox
                     checked={checked}
                     onCheckedChange={(c) => {
-                      if (c) onChange([...arr, opt.value])
-                      else onChange(arr.filter((v) => v !== opt.value))
+                      if (c) onChange([...arr, opt.value]);
+                      else onChange(arr.filter((v) => v !== opt.value));
                     }}
                   />
                   <span>{opt.label}</span>
                 </label>
-              )
+              );
             })}
           </div>
-        )
+        );
       }
       return (
         <div className="grid gap-2 sm:grid-cols-2">
           {(question.options ?? []).map((opt) => {
-            const checked = arr.includes(opt.value)
+            const checked = arr.includes(opt.value);
             return (
               <label
                 key={opt.value}
@@ -614,21 +623,21 @@ function Field({
                 <Checkbox
                   checked={checked}
                   onCheckedChange={(c) => {
-                    if (c) onChange([...arr, opt.value])
-                    else onChange(arr.filter((v) => v !== opt.value))
+                    if (c) onChange([...arr, opt.value]);
+                    else onChange(arr.filter((v) => v !== opt.value));
                   }}
                 />
                 {opt.label}
               </label>
-            )
+            );
           })}
         </div>
-      )
+      );
     }
     case "scale": {
-      const min = question.scale?.min ?? 1
-      const max = question.scale?.max ?? 5
-      const range = Array.from({ length: max - min + 1 }, (_, i) => min + i)
+      const min = question.scale?.min ?? 1;
+      const max = question.scale?.max ?? 5;
+      const range = Array.from({ length: max - min + 1 }, (_, i) => min + i);
       return (
         <div className="flex flex-wrap items-center gap-2">
           {question.scale?.minLabel && (
@@ -657,10 +666,10 @@ function Field({
             </span>
           )}
         </div>
-      )
+      );
     }
     case "consent": {
-      const accepted = value === true
+      const accepted = value === true;
       if (variant === "embed") {
         return (
           <label className="flex cursor-pointer items-start gap-3 text-sm text-foreground">
@@ -675,7 +684,7 @@ function Field({
               <RequiredMark required={question.required} />
             </span>
           </label>
-        )
+        );
       }
       return (
         <label
@@ -697,10 +706,10 @@ function Field({
             <RequiredMark required={question.required} />
           </span>
         </label>
-      )
+      );
     }
     case "info":
-      return null
+      return null;
     case "product":
       return (
         <ProductSelector
@@ -710,24 +719,27 @@ function Field({
           onChange={onChange}
           currency={currency}
           ticketCount={ticketCount}
+          eligibleTickets={eligibleTickets}
+          ticketSector={sectorName}
+          ticketRate={rateName}
         />
-      )
+      );
   }
-  return null
+  return null;
 }
 
 function isVisible(q: FormQuestion, answers: Answers): boolean {
-  if (!q.visibleWhen) return true
-  return answers[q.visibleWhen.question] === q.visibleWhen.equals
+  if (!q.visibleWhen) return true;
+  return answers[q.visibleWhen.question] === q.visibleWhen.equals;
 }
 
 function flattenZodErrors(err: ZodError): FieldErrors {
-  const out: FieldErrors = {}
+  const out: FieldErrors = {};
   for (const issue of err.issues) {
-    const key = issue.path[0]
+    const key = issue.path[0];
     if (typeof key === "string" && !out[key]) {
-      out[key] = issue.message
+      out[key] = issue.message;
     }
   }
-  return out
+  return out;
 }

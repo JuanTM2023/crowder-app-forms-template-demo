@@ -670,6 +670,17 @@ function WizardBody({
   const showNextButton = step.kind === "group" && !isLastStep;
   const showPreviewSubmit = previewMode && isLastStep;
 
+  const eligibleTickets = ctx.items.reduce(
+    (acc, item) => {
+      const key = `${item.sectorName}|${item.rateName}`.toUpperCase();
+
+      acc[key] = (acc[key] ?? 0) + (item.quantity ?? 1);
+
+      return acc;
+    },
+    {} as Record<string, number>,
+  );
+
   return (
     <>
       {steps.length > 1 && (
@@ -706,6 +717,7 @@ function WizardBody({
           stepId={step.stepId}
           currency={ctx.currency}
           ticketCount={ticketCountForScope(step.group.scope, ctx.items.length)}
+          eligibleTickets={eligibleTickets}
           productLists={productLists}
           initial={answers[step.stepId] ?? prefillAnswers(step, ctx.user)}
           onChange={(next) => onChange(step.stepId, next)}
@@ -777,6 +789,7 @@ function GroupStep({
   currency,
   ticketCount,
   productLists,
+  eligibleTickets,
   initial,
   onChange,
   onSubmit,
@@ -787,6 +800,7 @@ function GroupStep({
   currency: string;
   ticketCount: number;
   productLists?: ProductLists;
+  eligibleTickets?: Record<string, number>;
   initial: Record<string, unknown>;
   onChange: (a: Record<string, unknown>) => void;
   onSubmit: (a: Record<string, unknown>) => void;
@@ -824,6 +838,9 @@ function GroupStep({
         productLists={productsByQuestion}
         currency={currency}
         ticketCount={ticketCount}
+        eligibleTickets={eligibleTickets}
+        sectorName={step.item?.sectorName}
+        rateName={step.item?.rateName}
         omitHeader
         omitSubmit
         variant="embed"

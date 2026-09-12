@@ -14,6 +14,29 @@ import type { RenderProduct, RenderVariant } from "@/lib/products/types";
 // en productos con muchas combinaciones (ej. Talla × Color).
 const COLLAPSE_THRESHOLD = 5;
 
+function variantMatchesTicket(
+  variant: RenderVariant,
+  sector?: string,
+  rate?: string,
+) {
+  const variantSector = variant.options?.Sector;
+  const variantRate = variant.options?.Tarifa;
+
+  if (
+    sector &&
+    variantSector &&
+    variantSector.toLowerCase() !== sector.toLowerCase()
+  ) {
+    return false;
+  }
+
+  if (rate && variantRate && variantRate.toLowerCase() !== rate.toLowerCase()) {
+    return false;
+  }
+
+  return true;
+}
+
 // Render de la pregunta `product` (definition sección 8.3).
 //
 // Vista ÚNICA: carrito agrupado por producto, cada variante con su fila
@@ -96,6 +119,9 @@ export function ProductSelector({
   onChange,
   currency,
   ticketCount,
+  eligibleTickets,
+  ticketSector,
+  ticketRate,
 }: {
   config: FormQuestion["product"];
   products: RenderProduct[];
@@ -104,6 +130,9 @@ export function ProductSelector({
   currency?: string | null;
   // Cantidad de tickets (ya resuelta por scope) para el modo `perTickets`.
   ticketCount?: number;
+  eligibleTickets?: Record<string, number>;
+  ticketSector?: string;
+  ticketRate?: string;
 }) {
   // min/max EFECTIVOS: en modo `fixed` son los configurados; en `perTickets` se
   // derivan de la cantidad de tickets (1 producto por entrada).
@@ -112,6 +141,8 @@ export function ProductSelector({
   const showPrice = config?.showPrice ?? false;
   // Visualización del listado de productos: "list" (filas) o "cards" (grilla).
   const layout = config?.layout ?? "list";
+
+  void eligibleTickets;
 
   // Productos con muchas variantes colapsan la lista: por defecto solo se ven
   // las variantes ya agregadas + un botón para desplegar el resto.
@@ -317,18 +348,24 @@ export function ProductSelector({
   // muchas variantes colapsa: muestra solo las agregadas + un botón para elegir
   // el resto; expandida, muestra todas con un botón para volver a ocultar.
   const renderVariantSection = (p: RenderProduct, withPrice: boolean) => {
-    const many = p.variants.length > COLLAPSE_THRESHOLD;
+    const visibleVariants = p.variants.filter((v) =>
+      variantMatchesTicket(v, ticketSector, ticketRate),
+    );
+
+    const many = visibleVariants.length > COLLAPSE_THRESHOLD;
     const open = !many || expandedByProduct[p.id];
     const toggle = () =>
       setExpandedByProduct((s) => ({ ...s, [p.id]: !s[p.id] }));
     // Solo la rama colapsada consume `added`; evitamos el barrido cuando la
     // sección está abierta (el caso común: ≤ COLLAPSE_THRESHOLD variantes).
-    const added = open ? [] : p.variants.filter((v) => qtyOf(p.id, v.id) > 0);
+    const added = open
+      ? []
+      : visibleVariants.filter((v) => qtyOf(p.id, v.id) > 0);
     return (
       <div className="mt-2 space-y-1.5">
         {open ? (
           <>
-            {p.variants.map((v) => renderVariantLine(p, v, withPrice))}
+            {visibleVariants.map((v) => renderVariantLine(p, v, withPrice))}
             {many && (
               <button
                 type="button"
@@ -349,7 +386,7 @@ export function ProductSelector({
             >
               {added.length > 0
                 ? "Agregar otra variante"
-                : `Elegir variante (${p.variants.length})`}
+                : `Elegir variante (${visibleVariants.length})`}
             </button>
           </>
         )}
@@ -359,7 +396,9 @@ export function ProductSelector({
 
   // Listado: fila horizontal (miniatura a la izquierda, variantes a la derecha).
   const renderProductRow = (p: RenderProduct) => {
-    const soldOut = !p.variants.some((v) => v.sellable);
+    const soldOut = !p.variants
+      .filter((v) => variantMatchesTicket(v, ticketSector, ticketRate))
+      .some((v) => v.sellable);
     return (
       <div
         key={p.id}
@@ -389,7 +428,9 @@ export function ProductSelector({
   // con su propio stepper. Así se ven y controlan varias variantes del mismo
   // producto a la vez (ej. 1 de L/Negro + 1 de M/Rojo).
   const renderProductCard = (p: RenderProduct) => {
-    const soldOut = !p.variants.some((v) => v.sellable);
+    const soldOut = !p.variants
+      .filter((v) => variantMatchesTicket(v, ticketSector, ticketRate))
+      .some((v) => v.sellable);
     const images = galleryFor(p);
     const priceLabel = priceLabelFor(p);
     return (

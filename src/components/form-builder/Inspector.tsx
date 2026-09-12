@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import {
   RiAddLine,
@@ -8,37 +8,37 @@ import {
   RiArrowUpLine,
   RiCloseLine,
   RiDeleteBin6Line,
-} from "@remixicon/react"
-import type { ReactNode } from "react"
+} from "@remixicon/react";
+import type { ReactNode } from "react";
 
-import { Button } from "@/components/Button"
-import { Input } from "@/components/Input"
-import { Textarea } from "@/components/Textarea"
+import { Button } from "@/components/Button";
+import { Input } from "@/components/Input";
+import { Textarea } from "@/components/Textarea";
 import type {
   FormGroup,
   FormQuestion,
   GroupScope,
   QuestionType,
-} from "@/lib/db/schema"
-import { resolveProductMode } from "@/lib/products/derive"
+} from "@/lib/db/schema";
+import { resolveProductMode } from "@/lib/products/derive";
 
-import { deriveId } from "./derive"
-import { FieldLabel, IconButton, NativeSelect, SwitchRow } from "./primitives"
+import { deriveId } from "./derive";
+import { FieldLabel, IconButton, NativeSelect, SwitchRow } from "./primitives";
 import {
   CHOICE_TYPES,
   NUMBER_LIKE_TYPES,
   QUESTION_TYPES,
   QUESTION_TYPE_BY_VALUE,
   TEXT_LIKE_TYPES,
-} from "./question-types"
+} from "./question-types";
 
-type VisibleWhen = NonNullable<FormGroup["visibleWhen"]>
-type PrefillFrom = NonNullable<FormQuestion["prefillFrom"]>
+type VisibleWhen = NonNullable<FormGroup["visibleWhen"]>;
+type PrefillFrom = NonNullable<FormQuestion["prefillFrom"]>;
 
 const PREFILL_OPTIONS: {
-  value: PrefillFrom
-  label: string
-  scope: GroupScope | "any"
+  value: PrefillFrom;
+  label: string;
+  scope: GroupScope | "any";
 }[] = [
   { value: "user.email", label: "Email del usuario", scope: "any" },
   { value: "user.firstName", label: "Nombre del usuario", scope: "any" },
@@ -64,7 +64,7 @@ const PREFILL_OPTIONS: {
     label: "Número documento (item)",
     scope: "item",
   },
-]
+];
 
 /* ──────────────── Shell ──────────────── */
 
@@ -75,11 +75,11 @@ export function InspectorShell({
   actions,
   children,
 }: {
-  eyebrow: ReactNode
-  title: string
-  subtitle?: string
-  actions?: ReactNode
-  children: ReactNode
+  eyebrow: ReactNode;
+  title: string;
+  subtitle?: string;
+  actions?: ReactNode;
+  children: ReactNode;
 }) {
   return (
     <div className="flex flex-1 flex-col overflow-hidden">
@@ -105,24 +105,24 @@ export function InspectorShell({
         {children}
       </div>
     </div>
-  )
+  );
 }
 
 /* ──────────────── FormInspector ──────────────── */
 
 export type FormMeta = {
-  title: string
-  enabled: boolean
-}
+  title: string;
+  enabled: boolean;
+};
 
 export function FormInspector({
   meta,
   fieldErrors,
   onPatch,
 }: {
-  meta: FormMeta
-  fieldErrors?: Partial<Record<keyof FormMeta, string>>
-  onPatch: (patch: Partial<FormMeta>) => void
+  meta: FormMeta;
+  fieldErrors?: Partial<Record<keyof FormMeta, string>>;
+  onPatch: (patch: Partial<FormMeta>) => void;
 }) {
   return (
     <InspectorShell
@@ -144,7 +144,7 @@ export function FormInspector({
         onChange={(v) => onPatch({ enabled: v })}
       />
     </InspectorShell>
-  )
+  );
 }
 
 /* ──────────────── GroupInspector ──────────────── */
@@ -159,16 +159,16 @@ export function GroupInspector({
   onSelectQuestion,
   onAddQuestion,
 }: {
-  group: FormGroup
-  gIdx: number
-  total: number
-  onPatch: (patch: Partial<FormGroup>) => void
-  onRemove: () => void
-  onMove: (dir: -1 | 1) => void
-  onSelectQuestion: (qIdx: number) => void
-  onAddQuestion: () => void
+  group: FormGroup;
+  gIdx: number;
+  total: number;
+  onPatch: (patch: Partial<FormGroup>) => void;
+  onRemove: () => void;
+  onMove: (dir: -1 | 1) => void;
+  onSelectQuestion: (qIdx: number) => void;
+  onAddQuestion: () => void;
 }) {
-  const isItemScope = group.scope === "item"
+  const isItemScope = group.scope === "item";
   return (
     <InspectorShell
       eyebrow={`Grupo ${gIdx + 1} de ${total}`}
@@ -180,7 +180,11 @@ export function GroupInspector({
       }
       actions={
         <>
-          <IconButton onClick={() => onMove(-1)} disabled={gIdx === 0} label="Subir grupo">
+          <IconButton
+            onClick={() => onMove(-1)}
+            disabled={gIdx === 0}
+            label="Subir grupo"
+          >
             <RiArrowUpLine className="size-4" aria-hidden="true" />
           </IconButton>
           <IconButton
@@ -190,7 +194,12 @@ export function GroupInspector({
           >
             <RiArrowDownLine className="size-4" aria-hidden="true" />
           </IconButton>
-          <IconButton onClick={onRemove} disabled={total <= 1} label="Eliminar grupo" danger>
+          <IconButton
+            onClick={onRemove}
+            disabled={total <= 1}
+            label="Eliminar grupo"
+            danger
+          >
             <RiDeleteBin6Line className="size-4" aria-hidden="true" />
           </IconButton>
         </>
@@ -226,7 +235,9 @@ export function GroupInspector({
           rows={2}
           value={group.description ?? ""}
           onChange={(e) =>
-            onPatch({ description: e.target.value === "" ? null : e.target.value })
+            onPatch({
+              description: e.target.value === "" ? null : e.target.value,
+            })
           }
         />
       </FieldLabel>
@@ -298,8 +309,8 @@ export function GroupInspector({
             group.questions.map((q, qIdx) => {
               const typeMeta =
                 QUESTION_TYPE_BY_VALUE[q.type] ??
-                QUESTION_TYPE_BY_VALUE.short_text
-              const Icon = typeMeta.Icon
+                QUESTION_TYPE_BY_VALUE.short_text;
+              const Icon = typeMeta.Icon;
               return (
                 <button
                   key={q.id + ":" + qIdx}
@@ -307,7 +318,10 @@ export function GroupInspector({
                   onClick={() => onSelectQuestion(qIdx)}
                   className="group flex w-full items-center gap-3 px-3 py-2.5 text-left transition hover:bg-subtle/60"
                 >
-                  <Icon className="size-4 shrink-0 text-faint" aria-hidden="true" />
+                  <Icon
+                    className="size-4 shrink-0 text-faint"
+                    aria-hidden="true"
+                  />
                   <div className="min-w-0 flex-1">
                     <div className="truncate text-sm text-foreground">
                       {q.label || "(sin label)"}
@@ -322,22 +336,22 @@ export function GroupInspector({
                     aria-hidden="true"
                   />
                 </button>
-              )
+              );
             })
           )}
         </div>
       </div>
     </InspectorShell>
-  )
+  );
 }
 
 /* ──────────────── QuestionInspector ──────────────── */
 
 export type CatalogOption = {
-  id: string
-  title: string
-  collections: { id: string; title: string }[]
-}
+  id: string;
+  title: string;
+  collections: { id: string; title: string }[];
+};
 
 export function QuestionInspector({
   question,
@@ -352,43 +366,43 @@ export function QuestionInspector({
   onMove,
   onBackToGroup,
 }: {
-  question: FormQuestion
-  groupScope: GroupScope
-  qIdx: number
-  totalInGroup: number
-  groupTitle: string
-  siblings: { id: string; label: string }[]
-  catalogOptions?: CatalogOption[]
-  onPatch: (patch: Partial<FormQuestion>) => void
-  onRemove: () => void
-  onMove: (dir: -1 | 1) => void
-  onBackToGroup: () => void
+  question: FormQuestion;
+  groupScope: GroupScope;
+  qIdx: number;
+  totalInGroup: number;
+  groupTitle: string;
+  siblings: { id: string; label: string }[];
+  catalogOptions?: CatalogOption[];
+  onPatch: (patch: Partial<FormQuestion>) => void;
+  onRemove: () => void;
+  onMove: (dir: -1 | 1) => void;
+  onBackToGroup: () => void;
 }) {
-  const isChoice = CHOICE_TYPES.includes(question.type)
-  const isTextLike = TEXT_LIKE_TYPES.includes(question.type)
-  const isNumberLike = NUMBER_LIKE_TYPES.includes(question.type)
-  const isScale = question.type === "scale"
-  const isConsent = question.type === "consent"
-  const isInfo = question.type === "info"
-  const isProduct = question.type === "product"
+  const isChoice = CHOICE_TYPES.includes(question.type);
+  const isTextLike = TEXT_LIKE_TYPES.includes(question.type);
+  const isNumberLike = NUMBER_LIKE_TYPES.includes(question.type);
+  const isScale = question.type === "scale";
+  const isConsent = question.type === "consent";
+  const isInfo = question.type === "info";
+  const isProduct = question.type === "product";
 
   function handleTypeChange(nextType: QuestionType) {
-    const patch: Partial<FormQuestion> = { type: nextType }
+    const patch: Partial<FormQuestion> = { type: nextType };
     if (CHOICE_TYPES.includes(nextType) && !question.options) {
       patch.options = [
         { value: "opcion_1", label: "Opción 1" },
         { value: "opcion_2", label: "Opción 2" },
-      ]
+      ];
     }
-    if (!CHOICE_TYPES.includes(nextType)) patch.options = undefined
+    if (!CHOICE_TYPES.includes(nextType)) patch.options = undefined;
     if (nextType === "scale" && !question.scale) {
-      patch.scale = { min: 1, max: 5 }
+      patch.scale = { min: 1, max: 5 };
     }
-    if (nextType !== "scale") patch.scale = undefined
+    if (nextType !== "scale") patch.scale = undefined;
     if (nextType === "consent" && !question.consent) {
-      patch.consent = { mustAccept: true }
+      patch.consent = { mustAccept: true };
     }
-    if (nextType !== "consent") patch.consent = undefined
+    if (nextType !== "consent") patch.consent = undefined;
     // Seed de config product: catálogo (el primero disponible) + defaults.
     if (nextType === "product" && !question.product) {
       patch.product = {
@@ -397,10 +411,10 @@ export function QuestionInspector({
         min: 0,
         max: 1,
         showPrice: true,
-      }
+      };
     }
-    if (nextType !== "product") patch.product = undefined
-    onPatch(patch)
+    if (nextType !== "product") patch.product = undefined;
+    onPatch(patch);
   }
 
   return (
@@ -419,7 +433,11 @@ export function QuestionInspector({
       subtitle={`Pregunta ${qIdx + 1} de ${totalInGroup}`}
       actions={
         <>
-          <IconButton onClick={() => onMove(-1)} disabled={qIdx === 0} label="Subir">
+          <IconButton
+            onClick={() => onMove(-1)}
+            disabled={qIdx === 0}
+            label="Subir"
+          >
             <RiArrowUpLine className="size-4" aria-hidden="true" />
           </IconButton>
           <IconButton
@@ -472,7 +490,10 @@ export function QuestionInspector({
           <NativeSelect
             value={question.type}
             onChange={(v) => handleTypeChange(v as QuestionType)}
-            options={QUESTION_TYPES.map((t) => ({ value: t.value, label: t.label }))}
+            options={QUESTION_TYPES.map((t) => ({
+              value: t.value,
+              label: t.label,
+            }))}
           />
         </FieldLabel>
       </div>
@@ -544,11 +565,16 @@ export function QuestionInspector({
             />
           </summary>
           <div className="space-y-4 border-t border-border px-4 pb-4 pt-3">
-            <FieldLabel label="Texto de ayuda" hint="Aparece debajo del label, en gris.">
+            <FieldLabel
+              label="Texto de ayuda"
+              hint="Aparece debajo del label, en gris."
+            >
               <Input
                 value={question.help ?? ""}
                 onChange={(e) =>
-                  onPatch({ help: e.target.value === "" ? null : e.target.value })
+                  onPatch({
+                    help: e.target.value === "" ? null : e.target.value,
+                  })
                 }
               />
             </FieldLabel>
@@ -595,7 +621,7 @@ export function QuestionInspector({
         </details>
       )}
     </InspectorShell>
-  )
+  );
 }
 
 /* ──────────────── Sub-editors ──────────────── */
@@ -604,28 +630,28 @@ function OptionsEditor({
   options,
   onChange,
 }: {
-  options: { value: string; label: string }[]
-  onChange: (next: { value: string; label: string }[]) => void
+  options: { value: string; label: string }[];
+  onChange: (next: { value: string; label: string }[]) => void;
 }) {
   function updateLabel(idx: number, label: string) {
     onChange(
       options.map((o, i) => {
-        if (i !== idx) return o
+        if (i !== idx) return o;
         const otherValues = new Set(
           options.filter((_, j) => j !== idx).map((oo) => oo.value),
-        )
-        return { value: deriveId(label, "opcion", otherValues), label }
+        );
+        return { value: deriveId(label, "opcion", otherValues), label };
       }),
-    )
+    );
   }
   function remove(idx: number) {
-    if (options.length <= 1) return
-    onChange(options.filter((_, i) => i !== idx))
+    if (options.length <= 1) return;
+    onChange(options.filter((_, i) => i !== idx));
   }
   function add() {
-    const label = `Opción ${options.length + 1}`
-    const taken = new Set(options.map((o) => o.value))
-    onChange([...options, { value: deriveId(label, "opcion", taken), label }])
+    const label = `Opción ${options.length + 1}`;
+    const taken = new Set(options.map((o) => o.value));
+    onChange([...options, { value: deriveId(label, "opcion", taken), label }]);
   }
   return (
     <div className="space-y-2">
@@ -652,15 +678,15 @@ function OptionsEditor({
         <RiAddLine className="size-4" aria-hidden="true" /> Agregar opción
       </Button>
     </div>
-  )
+  );
 }
 
 function ScaleEditor({
   scale,
   onChange,
 }: {
-  scale: NonNullable<FormQuestion["scale"]>
-  onChange: (next: NonNullable<FormQuestion["scale"]>) => void
+  scale: NonNullable<FormQuestion["scale"]>;
+  onChange: (next: NonNullable<FormQuestion["scale"]>) => void;
 }) {
   return (
     <div className="grid gap-3 rounded-md border border-border bg-background p-3 sm:grid-cols-4">
@@ -701,7 +727,7 @@ function ScaleEditor({
         />
       </FieldLabel>
     </div>
-  )
+  );
 }
 
 function ProductConfigEditor({
@@ -709,15 +735,15 @@ function ProductConfigEditor({
   catalogOptions,
   onChange,
 }: {
-  config: FormQuestion["product"]
-  catalogOptions: CatalogOption[]
-  onChange: (next: NonNullable<FormQuestion["product"]>) => void
+  config: FormQuestion["product"];
+  catalogOptions: CatalogOption[];
+  onChange: (next: NonNullable<FormQuestion["product"]>) => void;
 }) {
-  const cfg = config ?? { catalogId: catalogOptions[0]?.id ?? "" }
-  const { mode, collectionId } = resolveProductMode(cfg)
+  const cfg = config ?? { catalogId: catalogOptions[0]?.id ?? "" };
+  const { mode, collectionId } = resolveProductMode(cfg);
 
   const patch = (p: Partial<NonNullable<FormQuestion["product"]>>) =>
-    onChange({ ...cfg, ...p })
+    onChange({ ...cfg, ...p });
 
   // Lista plana de colecciones para el selector: "Catálogo · Colección".
   const collectionChoices = catalogOptions.flatMap((c) =>
@@ -726,7 +752,7 @@ function ProductConfigEditor({
       label: `${c.title} · ${col.title}`,
       catalogId: c.id,
     })),
-  )
+  );
 
   const changeMode = (next: "collection" | "catalog" | "curated") => {
     // Cambiar de modo limpia los campos del modo anterior; catalogId se mantiene.
@@ -735,8 +761,8 @@ function ProductConfigEditor({
       collectionId: undefined,
       productIds: next === "curated" ? (cfg.productIds ?? []) : undefined,
       filter: undefined,
-    })
-  }
+    });
+  };
 
   return (
     <div className="grid gap-3 rounded-md border border-border bg-background p-3 sm:grid-cols-2">
@@ -746,7 +772,9 @@ function ProductConfigEditor({
       >
         <NativeSelect
           value={mode}
-          onChange={(v) => changeMode(v as "collection" | "catalog" | "curated")}
+          onChange={(v) =>
+            changeMode(v as "collection" | "catalog" | "curated")
+          }
           options={[
             { value: "collection", label: "Colección" },
             { value: "catalog", label: "Catálogo completo" },
@@ -761,17 +789,20 @@ function ProductConfigEditor({
             <NativeSelect
               value={collectionId ?? ""}
               onChange={(v) => {
-                const choice = collectionChoices.find((c) => c.value === v)
+                const choice = collectionChoices.find((c) => c.value === v);
                 patch({
                   source: "collection",
                   collectionId: v,
                   catalogId: choice?.catalogId ?? cfg.catalogId,
                   filter: undefined,
-                })
+                });
               }}
               options={[
                 { value: "", label: "Elegí una colección…" },
-                ...collectionChoices.map((c) => ({ value: c.value, label: c.label })),
+                ...collectionChoices.map((c) => ({
+                  value: c.value,
+                  label: c.label,
+                })),
               ]}
             />
           ) : (
@@ -786,7 +817,10 @@ function ProductConfigEditor({
             <NativeSelect
               value={cfg.catalogId}
               onChange={(v) => patch({ catalogId: v })}
-              options={catalogOptions.map((c) => ({ value: c.id, label: c.title }))}
+              options={catalogOptions.map((c) => ({
+                value: c.id,
+                label: c.title,
+              }))}
             />
           ) : (
             <Input
@@ -836,8 +870,8 @@ function ProductConfigEditor({
 
       {(cfg.quantitySource ?? "fixed") === "perTickets" ? (
         <div className="rounded-md border border-border bg-subtle p-3 text-xs text-muted-foreground">
-          El mínimo y el máximo se ajustan a la cantidad de entradas de la compra:
-          exactamente <strong>1 producto por entrada</strong>.
+          El mínimo y el máximo se ajustan a la cantidad de entradas de la
+          compra: exactamente <strong>1 producto por entrada</strong>.
         </div>
       ) : (
         <>
@@ -859,6 +893,71 @@ function ProductConfigEditor({
           </FieldLabel>
         </>
       )}
+
+      <FieldLabel
+        label="Tarifas permitidas"
+        hint="Separadas por coma. Vacío = todas las tarifas."
+      >
+        <Input
+          value={(cfg.allowedRates ?? []).join(", ")}
+          onChange={(e) =>
+            patch({
+              allowedRates: e.target.value
+                .split(",")
+                .map((s) => s.trim())
+                .filter(Boolean),
+            })
+          }
+          placeholder="Adulto, Niño"
+        />
+      </FieldLabel>
+
+      <FieldLabel
+        label="Sectores permitidos"
+        hint="Separados por coma. Vacío = todos los sectores."
+      >
+        <Input
+          value={(cfg.allowedSectors ?? []).join(", ")}
+          onChange={(e) =>
+            patch({
+              allowedSectors: e.target.value
+                .split(",")
+                .map((s) => s.trim())
+                .filter(Boolean),
+            })
+          }
+          placeholder="Super VIP, VIP, General"
+        />
+      </FieldLabel>
+
+      <FieldLabel
+        label="Restricción por tickets"
+        hint="Controla si las variantes se relacionan con Sector/Tarifa."
+      >
+        <NativeSelect
+          value={cfg.eligibilityMode ?? "none"}
+          onChange={(v) =>
+            patch({
+              eligibilityMode: v as "none" | "filter" | "filter_and_limit",
+            })
+          }
+          options={[
+            {
+              value: "none",
+              label: "Ninguna",
+            },
+            {
+              value: "filter",
+              label: "Solo filtrar variantes compatibles",
+            },
+            {
+              value: "filter_and_limit",
+              label: "Filtrar variantes y limitar cantidades",
+            },
+          ]}
+        />
+      </FieldLabel>
+
       <FieldLabel
         label="Visualización"
         hint="Listado: filas compactas. Cards: grilla estilo ecommerce."
@@ -880,7 +979,7 @@ function ProductConfigEditor({
         />
       </div>
     </div>
-  )
+  );
 }
 
 function ValidationEditor({
@@ -888,19 +987,19 @@ function ValidationEditor({
   isNumber,
   onChange,
 }: {
-  validation: FormQuestion["validation"] | null
-  isNumber: boolean
-  onChange: (next: FormQuestion["validation"] | null) => void
+  validation: FormQuestion["validation"] | null;
+  isNumber: boolean;
+  onChange: (next: FormQuestion["validation"] | null) => void;
 }) {
-  const v = validation ?? {}
+  const v = validation ?? {};
   function patch(p: NonNullable<FormQuestion["validation"]>) {
-    const next = { ...v, ...p }
+    const next = { ...v, ...p };
     const isEmpty =
       next.min === undefined &&
       next.max === undefined &&
       (next.pattern === undefined || next.pattern === "") &&
-      (next.message === undefined || next.message === "")
-    onChange(isEmpty ? null : next)
+      (next.message === undefined || next.message === "");
+    onChange(isEmpty ? null : next);
   }
   return (
     <div className="space-y-2 rounded-md border border-border bg-background p-3">
@@ -954,7 +1053,7 @@ function ValidationEditor({
         </FieldLabel>
       </div>
     </div>
-  )
+  );
 }
 
 function VisibleWhenEditor({
@@ -962,16 +1061,16 @@ function VisibleWhenEditor({
   onChange,
   referenceableQuestions,
 }: {
-  value: VisibleWhen | null
-  onChange: (next: VisibleWhen | null) => void
-  referenceableQuestions: { id: string; label: string }[]
+  value: VisibleWhen | null;
+  onChange: (next: VisibleWhen | null) => void;
+  referenceableQuestions: { id: string; label: string }[];
 }) {
-  const enabled = value !== null
+  const enabled = value !== null;
   function toggle(on: boolean) {
     if (on) {
-      onChange({ question: referenceableQuestions[0]?.id ?? "", equals: "" })
+      onChange({ question: referenceableQuestions[0]?.id ?? "", equals: "" });
     } else {
-      onChange(null)
+      onChange(null);
     }
   }
   return (
@@ -1007,5 +1106,5 @@ function VisibleWhenEditor({
         </div>
       )}
     </div>
-  )
+  );
 }

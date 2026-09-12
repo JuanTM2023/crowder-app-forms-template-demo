@@ -379,6 +379,12 @@ export type FormQuestion = {
     //     transacción (context.items.length) → 1 producto por entrada (1:1
     //     exacto). Los min/max de abajo se ignoran.
     quantitySource?: "fixed" | "perTickets";
+
+    allowedSectors?: string[];
+    allowedRates?: string[];
+
+    eligibilityMode?: "none" | "filter" | "filter_and_limit";
+
     min?: number; // mínimo a elegir (default 0). Solo aplica en modo "fixed".
     max?: number; // máximo a elegir en UNIDADES totales (default 1). Solo "fixed".
     showPrice?: boolean;

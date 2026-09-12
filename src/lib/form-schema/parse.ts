@@ -1,12 +1,12 @@
-import { z } from "zod"
+import { z } from "zod";
 
-import type { FormDefinition } from "@/lib/db/schema"
-import { MAX_PARTNER_ITEMS } from "@/lib/products/derive"
+import type { FormDefinition } from "@/lib/db/schema";
+import { MAX_PARTNER_ITEMS } from "@/lib/products/derive";
 
 const visibleWhenSchema = z.object({
   question: z.string().min(1),
   equals: z.union([z.string(), z.number(), z.boolean()]),
-})
+});
 
 const prefillFromValues = [
   "item.holder.firstName",
@@ -17,16 +17,16 @@ const prefillFromValues = [
   "user.firstName",
   "user.lastName",
   "user.country",
-] as const
+] as const;
 
 const itemPrefillValues = new Set<(typeof prefillFromValues)[number]>([
   "item.holder.firstName",
   "item.holder.lastName",
   "item.holder.documentType",
   "item.holder.documentNumber",
-])
+]);
 
-const SNAKE_CASE_ID = /^[a-z][a-z0-9_]*$/
+const SNAKE_CASE_ID = /^[a-z][a-z0-9_]*$/;
 
 const questionTypeValues = [
   "short_text",
@@ -46,18 +46,18 @@ const questionTypeValues = [
   "consent",
   "info",
   "product",
-] as const
+] as const;
 
 const CHOICE_TYPES = new Set<(typeof questionTypeValues)[number]>([
   "single_choice",
   "multiple_choice",
   "dropdown",
-])
+]);
 
 const optionSchema = z.object({
   value: z.string().min(1),
   label: z.string().min(1),
-})
+});
 
 const validationSchema = z
   .object({
@@ -66,7 +66,7 @@ const validationSchema = z
     pattern: z.string().optional(),
     message: z.string().optional(),
   })
-  .optional()
+  .optional();
 
 const questionSchema = z
   .object({
@@ -103,6 +103,10 @@ const questionSchema = z
         // "perTickets": min/max se derivan de la cantidad de entradas (1 por
         // entrada); "fixed" (default): usa los min/max de abajo.
         quantitySource: z.enum(["fixed", "perTickets"]).optional(),
+
+        allowedSectors: z.array(z.string()).optional(),
+        allowedRates: z.array(z.string()).optional(),
+
         min: z.number().int().min(0).optional(),
         // Salvaguarda anti-abuso (ya no el "1–10" del protocolo, que Crowder acepta
         // superar): cota alta al máximo configurable.
@@ -120,21 +124,21 @@ const questionSchema = z
         code: z.ZodIssueCode.custom,
         path: ["options"],
         message: `'${q.type}' requires non-empty options`,
-      })
+      });
     }
     if (q.type === "scale" && !q.scale) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
         path: ["scale"],
         message: "'scale' requires scale config",
-      })
+      });
     }
     if (q.type === "consent" && !q.consent) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
         path: ["consent"],
         message: "'consent' requires consent config",
-      })
+      });
     }
     if (q.type === "product") {
       if (!q.product) {
@@ -142,34 +146,41 @@ const questionSchema = z
           code: z.ZodIssueCode.custom,
           path: ["product"],
           message: "'product' requires product config with catalogId",
-        })
+        });
       } else {
-        const p = q.product
+        const p = q.product;
         if (p.min != null && p.max != null && p.min > p.max) {
           ctx.addIssue({
             code: z.ZodIssueCode.custom,
             path: ["product", "min"],
             message: "min cannot be greater than max",
-          })
+          });
         }
         // Consistencia del modo de listado (la colección es el modo principal):
-        if (p.source === "collection" && !p.collectionId && !p.filter?.collection) {
+        if (
+          p.source === "collection" &&
+          !p.collectionId &&
+          !p.filter?.collection
+        ) {
           ctx.addIssue({
             code: z.ZodIssueCode.custom,
             path: ["product", "collectionId"],
             message: "source 'collection' requires collectionId",
-          })
+          });
         }
-        if (p.source === "curated" && (!p.productIds || p.productIds.length === 0)) {
+        if (
+          p.source === "curated" &&
+          (!p.productIds || p.productIds.length === 0)
+        ) {
           ctx.addIssue({
             code: z.ZodIssueCode.custom,
             path: ["product", "productIds"],
             message: "source 'curated' requires at least one productId",
-          })
+          });
         }
       }
     }
-  })
+  });
 
 const groupSchema = z
   .object({
@@ -182,16 +193,16 @@ const groupSchema = z
     questions: z.array(questionSchema).min(1),
   })
   .superRefine((group, ctx) => {
-    const ids = new Set<string>()
+    const ids = new Set<string>();
     group.questions.forEach((q, idx) => {
       if (ids.has(q.id)) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
           path: ["questions", idx, "id"],
           message: `duplicate question id '${q.id}'`,
-        })
+        });
       }
-      ids.add(q.id)
+      ids.add(q.id);
       if (
         q.prefillFrom &&
         group.scope === "transaction" &&
@@ -201,10 +212,10 @@ const groupSchema = z
           code: z.ZodIssueCode.custom,
           path: ["questions", idx, "prefillFrom"],
           message: "item.holder.* prefill only valid in scope=item groups",
-        })
+        });
       }
-    })
-  })
+    });
+  });
 
 export const formDefinitionSchema = z
   .object({
@@ -212,21 +223,21 @@ export const formDefinitionSchema = z
     groups: z.array(groupSchema).min(1),
   })
   .superRefine((def, ctx) => {
-    const groupIds = new Set<string>()
+    const groupIds = new Set<string>();
     def.groups.forEach((g, idx) => {
       if (groupIds.has(g.id)) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
           path: ["groups", idx, "id"],
           message: `duplicate group id '${g.id}'`,
-        })
+        });
       }
-      groupIds.add(g.id)
-    })
-  })
+      groupIds.add(g.id);
+    });
+  });
 
 export function parseFormDefinition(raw: unknown): FormDefinition {
-  return formDefinitionSchema.parse(raw) as FormDefinition
+  return formDefinitionSchema.parse(raw) as FormDefinition;
 }
 
 export function emptyDefinition(): FormDefinition {
@@ -251,5 +262,5 @@ export function emptyDefinition(): FormDefinition {
         ],
       },
     ],
-  }
+  };
 }
