@@ -142,7 +142,7 @@ export function ProductSelector({
   // Visualización del listado de productos: "list" (filas) o "cards" (grilla).
   const layout = config?.layout ?? "list";
 
-  void eligibleTickets;
+  const eligibilityMode = config?.eligibilityMode ?? "none";
 
   // Productos con muchas variantes colapsan la lista: por defecto solo se ven
   // las variantes ya agregadas + un botón para desplegar el resto.
@@ -348,9 +348,37 @@ export function ProductSelector({
   // muchas variantes colapsa: muestra solo las agregadas + un botón para elegir
   // el resto; expandida, muestra todas con un botón para volver a ocultar.
   const renderVariantSection = (p: RenderProduct, withPrice: boolean) => {
-    const visibleVariants = p.variants.filter((v) =>
-      variantMatchesTicket(v, ticketSector, ticketRate),
-    );
+    const visibleVariants = p.variants.filter((v) => {
+      if (eligibilityMode === "none") {
+        return true;
+      }
+
+      if (eligibilityMode === "filter") {
+        const sector = v.options?.Sector ?? "";
+        const rate = v.options?.Tarifa ?? "";
+
+        const key = `${sector}|${rate}`.toUpperCase();
+
+        return (
+          eligibleTickets &&
+          Object.prototype.hasOwnProperty.call(eligibleTickets, key)
+        );
+      }
+
+      if (eligibilityMode === "filter_and_limit") {
+        const sector = v.options?.Sector ?? "";
+        const rate = v.options?.Tarifa ?? "";
+
+        const key = `${sector}|${rate}`.toUpperCase();
+
+        return (
+          eligibleTickets &&
+          Object.prototype.hasOwnProperty.call(eligibleTickets, key)
+        );
+      }
+
+      return true;
+    });
 
     const many = visibleVariants.length > COLLAPSE_THRESHOLD;
     const open = !many || expandedByProduct[p.id];
