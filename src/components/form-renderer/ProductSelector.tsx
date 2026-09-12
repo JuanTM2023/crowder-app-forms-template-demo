@@ -390,9 +390,15 @@ export function ProductSelector({
         });
 
         const sector = v.options?.Sector ?? "";
-        const rate = v.options?.Tarifa ?? "";
+        const rate = v.title.toUpperCase();
 
         const key = `${sector}|${rate}`.toUpperCase();
+
+        console.log("KEY DEBUG", {
+          sector,
+          rate,
+          key,
+        });
 
         return (
           eligibleTickets &&
