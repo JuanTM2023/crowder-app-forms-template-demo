@@ -144,15 +144,13 @@ export function ProductSelector({
 
   const eligibilityMode = config?.eligibilityMode ?? "none";
 
+  console.log("config", config);
   console.log("eligibilityMode", eligibilityMode);
   console.log("eligibleTickets", eligibleTickets);
 
   products.forEach((p) => {
     p.variants.forEach((v) => {
-      console.log("variant", {
-        title: v.title,
-        options: v.options,
-      });
+      console.log("variant options", JSON.stringify(v.options, null, 2));
     });
   });
 
