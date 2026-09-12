@@ -394,6 +394,8 @@ export function ProductSelector({
 
         const key = `${sector}|${rate}`.toUpperCase();
 
+        console.log("MATCH?", key, eligibleTickets?.[key]);
+
         console.log("KEY DEBUG", {
           sector,
           rate,
