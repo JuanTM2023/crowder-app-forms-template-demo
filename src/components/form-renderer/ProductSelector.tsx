@@ -142,6 +142,8 @@ export function ProductSelector({
   // Visualización del listado de productos: "list" (filas) o "cards" (grilla).
   const layout = config?.layout ?? "list";
 
+  console.log("CONFIG_JSON", JSON.stringify(config, null, 2));
+
   const eligibilityMode = config?.eligibilityMode ?? "none";
 
   console.log("config", config);
