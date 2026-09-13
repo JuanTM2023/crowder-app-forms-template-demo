@@ -209,6 +209,20 @@ export function ProductSelector({
   const qtyOf = (productId: string, variantId: string): number =>
     qtyByKey.get(`${productId}:${variantId}`) ?? 0;
 
+  const qtyOfRate = (rate: string): number => {
+    return picks.reduce((sum, pick) => {
+      const product = products.find((p) => p.id === pick.productId);
+
+      const variant = product?.variants.find((v) => v.id === pick.variantId);
+
+      if (variant && variant.title.toUpperCase() === rate.toUpperCase()) {
+        return sum + (pick.quantity ?? 1);
+      }
+
+      return sum;
+    }, 0);
+  };
+
   // Fija la cantidad de una línea (producto+variante). 0 → la quita del carrito.
   // El tope de la línea es el stock de la variante (`available`, null = ilimitado);
   // el tope global es el `max` de la pregunta.
@@ -268,7 +282,18 @@ export function ProductSelector({
   // Control de una variante: Agotado / Agregar / stepper `− qty +`. Compartido
   // por ambos layouts.
   const renderControls = (p: RenderProduct, v: RenderVariant, qty: number) => {
-    const canAdd = v.sellable && (qty > 0 || !atMax);
+    const rate = v.title.toUpperCase();
+
+    const allowedForRate = Object.entries(eligibleTickets ?? {})
+      .filter(([key]) => key.endsWith(`|${rate}`))
+      .reduce((sum, [, qty]) => sum + qty, 0);
+
+    const selectedForRate = qtyOfRate(rate);
+
+    const rateLimitReached =
+      allowedForRate > 0 && selectedForRate >= allowedForRate;
+
+    const canAdd = v.sellable && !rateLimitReached && (qty > 0 || !atMax);
     // Sin más para agregar: por tope global o por stock de la variante.
     const atVariantMax = v.available != null && qty >= v.available;
     const label = hasRealVariants(p) ? v.title : p.title;
@@ -301,7 +326,7 @@ export function ProductSelector({
         <button
           type="button"
           className="size-6 rounded border border-border text-sm disabled:cursor-not-allowed disabled:opacity-40"
-          disabled={atMax || atVariantMax}
+          disabled={atMax || atVariantMax || rateLimitReached}
           onClick={() => setQty(p, v, qty + 1)}
           aria-label={`Agregar una unidad de ${label}`}
         >
