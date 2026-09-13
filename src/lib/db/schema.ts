@@ -691,3 +691,50 @@ export const stockReservations = pgTable(
       .where(sql`${t.status} = 'held'`),
   ],
 );
+
+export const foodVouchers = pgTable("food_vouchers", {
+  id: uuid("id").defaultRandom().primaryKey(),
+
+  voucherNumber: text("voucher_number").notNull(),
+
+  transactionId: text("transaction_id")
+    .notNull()
+    .references(() => transactions.id, {
+      onDelete: "cascade",
+    }),
+
+  partnerItemUuid: text("partner_item_uuid").notNull(),
+
+  itemUuid: text("item_uuid"),
+
+  customerName: text("customer_name"),
+
+  eventName: text("event_name").notNull(),
+
+  show: text("show"),
+
+  sectorName: text("sector_name"),
+
+  sectionName: text("section_name"),
+
+  productName: text("product_name").notNull(),
+
+  price: doublePrecision("price").notNull(),
+
+  serviceFee: doublePrecision("service_fee").notNull().default(0),
+
+  status: text("status")
+    .$type<"pending" | "redeemed" | "cancelled">()
+    .notNull()
+    .default("pending"),
+
+  redeemedAt: timestamp("redeemed_at", {
+    withTimezone: true,
+  }),
+
+  createdAt: timestamp("created_at", {
+    withTimezone: true,
+  })
+    .notNull()
+    .defaultNow(),
+});
