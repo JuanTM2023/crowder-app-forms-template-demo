@@ -171,6 +171,9 @@ export async function POST(req: NextRequest) {
         answers: s.answers,
       })),
     });
+
+    console.log("PARTNER ITEMS", JSON.stringify(partnerItems, null, 2));
+
     const body = {
       interaction: transactionId,
       currency: parsed.data.context.currency,
