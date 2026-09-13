@@ -1,12 +1,12 @@
-import type { FormQuestion, GroupScope } from "@/lib/db/schema"
+import type { FormQuestion, GroupScope } from "@/lib/db/schema";
 
-import { MAX_PARTNER_ITEMS } from "./derive"
+import { MAX_PARTNER_ITEMS } from "./derive";
 
 // Suma de UNIDADES de un carrito de picks (cada línea cuenta `quantity ?? 1`).
 // Definición central del modelo: el min/max de una pregunta `product` cuenta
 // unidades totales, no líneas. Compartida por la validación y el iframe.
 export function sumUnits(picks: { quantity?: number }[]): number {
-  return picks.reduce((n, p) => n + (p.quantity ?? 1), 0)
+  return picks.reduce((n, p) => n + (p.quantity ?? 1), 0);
 }
 
 // Cuántos "tickets" cuentan para derivar el min/max de una pregunta `product`
@@ -21,7 +21,7 @@ export function ticketCountForScope(
   scope: GroupScope,
   itemsLength: number,
 ): number {
-  return scope === "transaction" ? itemsLength : 1
+  return scope === "transaction" ? itemsLength : 1;
 }
 
 // Resuelve el min/max EFECTIVO de una pregunta `product` (única fuente de verdad
@@ -39,11 +39,14 @@ export function resolveQuantityBounds(
   ticketCount?: number,
 ): { min: number; max: number } {
   // Sin config (o pregunta no-product): rango por defecto de un único ítem.
-  if (!cfg) return { min: 0, max: 1 }
+  if (!cfg) return { min: 0, max: 1 };
   if (cfg.quantitySource === "perTickets") {
-    if (ticketCount == null) return { min: 0, max: MAX_PARTNER_ITEMS }
-    const n = Math.max(ticketCount, 0)
-    return { min: n, max: Math.max(n, 1) }
+    if (ticketCount == null) return { min: 0, max: MAX_PARTNER_ITEMS };
+    const n = Math.max(ticketCount, 0);
+    return {
+      min: 0,
+      max: Math.max(n, 1),
+    };
   }
-  return { min: cfg.min ?? 0, max: cfg.max ?? 1 }
+  return { min: cfg.min ?? 0, max: cfg.max ?? 1 };
 }
