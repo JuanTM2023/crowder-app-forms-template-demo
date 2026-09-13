@@ -356,6 +356,9 @@ export function ProductSelector({
     );
   };
 
+  function normalizeSector(value: string) {
+    return value.toUpperCase().replace(/\s+/g, " ").split("(")[0].trim();
+  }
   // Sección de variantes de un producto (compartida por ambos layouts). Con
   // muchas variantes colapsa: muestra solo las agregadas + un botón para elegir
   // el resto; expandida, muestra todas con un botón para volver a ocultar.
@@ -390,6 +393,8 @@ export function ProductSelector({
         });
 
         const sector = v.options?.Sector ?? "";
+        const normalizedSector = normalizeSector(sector);
+
         const rate = v.title.toUpperCase();
 
         const key = `${sector}|${rate}`.toUpperCase();
@@ -402,10 +407,37 @@ export function ProductSelector({
           key,
         });
 
-        return (
+        const exactMatch =
           eligibleTickets &&
-          Object.prototype.hasOwnProperty.call(eligibleTickets, key)
+          Object.prototype.hasOwnProperty.call(eligibleTickets, key);
+
+        const partialMatch = Object.keys(eligibleTickets ?? {}).some(
+          (ticketKey) => {
+            const [ticketSector, ticketRate] = ticketKey.split("|");
+
+            return (
+              normalizeSector(ticketSector ?? "") === normalizedSector &&
+              (ticketRate ?? "").trim().toUpperCase() === rate
+            );
+          },
         );
+
+        console.log("PARTIAL MATCH CHECK", {
+          ticketSector,
+          normalizedTicketSector: normalizeSector(ticketSector ?? ""),
+          normalizedSector,
+          ticketRate,
+          rate,
+        });
+
+        console.log("MATCH TYPES", {
+          exactMatch,
+          partialMatch,
+          normalizedSector,
+          rate,
+        });
+
+        return exactMatch || partialMatch;
       }
 
       return true;
