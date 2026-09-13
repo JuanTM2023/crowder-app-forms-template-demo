@@ -738,3 +738,51 @@ export const foodVouchers = pgTable("food_vouchers", {
     .notNull()
     .defaultNow(),
 });
+
+export const foodVoucherLines = pgTable("food_voucher_lines", {
+  id: uuid("id").defaultRandom().primaryKey(),
+
+  voucherId: uuid("voucher_id")
+    .notNull()
+    .references(() => foodVouchers.id, {
+      onDelete: "cascade",
+    }),
+
+  productName: text("product_name").notNull(),
+
+  quantityPurchased: integer("quantity_purchased").notNull(),
+
+  quantityRedeemed: integer("quantity_redeemed").notNull().default(0),
+
+  createdAt: timestamp("created_at", {
+    withTimezone: true,
+  })
+    .notNull()
+    .defaultNow(),
+});
+
+export const foodVoucherRedemptions = pgTable("food_voucher_redemptions", {
+  id: uuid("id").defaultRandom().primaryKey(),
+
+  voucherId: uuid("voucher_id")
+    .notNull()
+    .references(() => foodVouchers.id, {
+      onDelete: "cascade",
+    }),
+
+  voucherLineId: uuid("voucher_line_id")
+    .notNull()
+    .references(() => foodVoucherLines.id, {
+      onDelete: "cascade",
+    }),
+
+  quantity: integer("quantity").notNull().default(1),
+
+  redeemedBy: text("redeemed_by"),
+
+  redeemedAt: timestamp("redeemed_at", {
+    withTimezone: true,
+  })
+    .notNull()
+    .defaultNow(),
+});
