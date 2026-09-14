@@ -52,13 +52,35 @@ export async function generateFoodVouchers({
     })
     .returning();
 
-  await db.insert(foodVoucherLines).values({
-    voucherId: voucher.id,
+  const grouped = new Map<string, { productName: string; quantity: number }>();
 
-    productName: partnerItems[0]?.description ?? "PRODUCTO",
+  for (const item of partnerItems) {
+    // ignorar la línea de cargo por servicio
+    if (item.description === "Cargo por servicio") {
+      continue;
+    }
 
-    quantityPurchased: 1,
+    const current = grouped.get(item.description);
 
-    quantityRedeemed: 0,
-  });
+    if (current) {
+      current.quantity++;
+    } else {
+      grouped.set(item.description, {
+        productName: item.description,
+        quantity: 1,
+      });
+    }
+  }
+
+  await db.insert(foodVoucherLines).values(
+    Array.from(grouped.values()).map((row) => ({
+      voucherId: voucher.id,
+
+      productName: row.productName,
+
+      quantityPurchased: row.quantity,
+
+      quantityRedeemed: 0,
+    })),
+  );
 }
