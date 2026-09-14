@@ -1,6 +1,7 @@
 import { db } from "@/lib/db";
 import { foodVouchers, foodVoucherLines } from "@/lib/db/schema";
 import { eq } from "drizzle-orm";
+import QRCode from "qrcode";
 
 export default async function VoucherPage({
   params,
@@ -17,6 +18,10 @@ export default async function VoucherPage({
       voucherNumber,
     ),
   });
+
+  const qrCode = voucher?.qrUrl
+  ? await QRCode.toDataURL(voucher.qrUrl)
+  : null;
 
   if (!voucher) {
     return (
@@ -58,6 +63,22 @@ export default async function VoucherPage({
         <strong>Sector:</strong>{" "}
         {voucher.sectorName}
       </p>
+
+
+{qrCode && (
+<div
+style={{
+marginTop: "30px",
+marginBottom: "30px",
+}}
+>  
+<img
+src={qrCode}
+alt="QR Voucher"/>
+</div>
+)
+}
+
 
       <p>
         <strong>Estado:</strong>{" "}
