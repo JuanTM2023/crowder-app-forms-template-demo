@@ -2,6 +2,8 @@ import { db } from "@/lib/db";
 
 import { foodVouchers, foodVoucherLines } from "@/lib/db/schema";
 
+import { desc } from "drizzle-orm";
+
 export async function generateFoodVouchers({
   transactionId,
   context,
@@ -44,10 +46,24 @@ export async function generateFoodVouchers({
       .join(" ")
       .trim() || null;
 
+  const lastVoucher = await db
+    .select()
+    .from(foodVouchers)
+    .orderBy(desc(foodVouchers.createdAt))
+    .limit(1);
+
+  const lastNumber = lastVoucher[0]?.voucherNumber?.split("-")?.at(-1);
+
+  const year = new Date().getFullYear();
+
+  const nextSequence = (Number(lastNumber) || 0) + 1;
+
+  const voucherNumber = `ALM-${year}-${String(nextSequence).padStart(6, "0")}`;
+
   const [voucher] = await db
     .insert(foodVouchers)
     .values({
-      voucherNumber: `PRD-${transactionId}`,
+      voucherNumber: voucherNumber,
 
       transactionId,
 
