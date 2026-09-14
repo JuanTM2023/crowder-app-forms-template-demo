@@ -5,12 +5,23 @@ import { foodVouchers, foodVoucherLines } from "@/lib/db/schema";
 export async function generateFoodVouchers({
   transactionId,
   context,
+  items,
   partnerItems,
 }: {
   transactionId: string;
   context: {
     eventName: string;
+    user?: {
+      firstName?: string | null;
+      lastName?: string | null;
+    } | null;
   };
+
+  items: {
+    show?: string | null;
+    sectorName: string;
+    sectionName?: string | null;
+  }[];
   partnerItems: {
     uuid: string;
     description: string;
@@ -20,6 +31,14 @@ export async function generateFoodVouchers({
   console.log("GENERATING FOOD VOUCHERS", transactionId);
 
   console.log("PARTNER ITEMS", JSON.stringify(partnerItems, null, 2));
+
+  const firstItem = items[0];
+
+  const customerName =
+    [context.user?.firstName, context.user?.lastName]
+      .filter(Boolean)
+      .join(" ")
+      .trim() || null;
 
   const [voucher] = await db
     .insert(foodVouchers)
@@ -32,15 +51,15 @@ export async function generateFoodVouchers({
 
       itemUuid: null,
 
-      customerName: null,
+      customerName: customerName,
 
       eventName: context.eventName,
 
-      show: context.eventName,
+      show: firstItem?.show ?? null,
 
-      sectorName: null,
+      sectorName: firstItem?.sectorName ?? null,
 
-      sectionName: null,
+      sectionName: firstItem?.sectionName ?? null,
 
       productName: partnerItems[0]?.description ?? "PRODUCTO",
 

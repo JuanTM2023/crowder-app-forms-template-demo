@@ -262,6 +262,7 @@ export async function submitBatch(input: {
   await generateFoodVouchers({
     transactionId,
     context,
+    items: context.items,
     partnerItems,
   });
 
