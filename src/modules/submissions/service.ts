@@ -259,7 +259,11 @@ export async function submitBatch(input: {
     return tx.insert(submissionsTable).values(rows).returning();
   });
 
-  await generateFoodVouchers(transactionId);
+  await generateFoodVouchers({
+    transactionId,
+    context,
+    partnerItems,
+  });
 
   return { transactionId, submissions: inserted, partnerItems };
 }

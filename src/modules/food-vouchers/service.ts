@@ -1,31 +1,45 @@
 import { db } from "@/lib/db";
 import { foodVouchers } from "@/lib/db/schema";
 
-export async function generateFoodVouchers(transactionId: string) {
+export async function generateFoodVouchers({
+  transactionId,
+  context,
+  partnerItems,
+}: {
+  transactionId: string;
+  context: {
+    eventName: string;
+  };
+  partnerItems: {
+    uuid: string;
+    description: string;
+    price: number;
+  }[];
+}) {
   console.log("GENERATING FOOD VOUCHERS", transactionId);
 
   await db.insert(foodVouchers).values({
-    voucherNumber: `TEST-${transactionId}`,
+    voucherNumber: `PRD-${transactionId}`,
 
     transactionId,
 
-    partnerItemUuid: "TEMP",
+    partnerItemUuid: partnerItems[0]?.uuid ?? "N/A",
 
     itemUuid: null,
 
-    customerName: "TEST",
+    customerName: null,
 
-    eventName: "TEST EVENT",
+    eventName: context.eventName,
 
-    show: "TEST SHOW",
+    show: context.eventName,
 
-    sectorName: "TEST SECTOR",
+    sectorName: null,
 
-    sectionName: "TEST SECTION",
+    sectionName: null,
 
-    productName: "TEST PRODUCT",
+    productName: partnerItems[0]?.description ?? "PRODUCTO",
 
-    price: 0,
+    price: partnerItems[0]?.price ?? 0,
 
     serviceFee: 0,
 
