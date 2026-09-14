@@ -72,6 +72,10 @@ export async function generateFoodVouchers({
 
   const voucherNumber = `ALM-${year}-${String(nextSequence).padStart(6, "0")}`;
 
+  const qrUrl =
+  `${process.env.NEXT_PUBLIC_APP_URL}/vouchers/preview`;
+
+
   const [voucher] = await db
     .insert(foodVouchers)
     .values({
@@ -98,6 +102,8 @@ export async function generateFoodVouchers({
       price: partnerItems[0]?.price ?? 0,
 
       serviceFee: 0,
+
+      qrUrl: qrUrl,
 
       status: "pending",
     })

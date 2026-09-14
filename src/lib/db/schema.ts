@@ -723,6 +723,14 @@ export const foodVouchers = pgTable("food_vouchers", {
 
   serviceFee: doublePrecision("service_fee").notNull().default(0),
 
+  customerEmail: text("customer_email"),
+
+qrUrl: text("qr_url"),
+
+tableNumber: text("table_number"),
+
+redeemedBy: text("redeemed_by"),
+
   status: text("status")
     .$type<"pending" | "redeemed" | "cancelled">()
     .notNull()
