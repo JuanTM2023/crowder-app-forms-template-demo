@@ -72,8 +72,13 @@ export async function generateFoodVouchers({
 
   const voucherNumber = `ALM-${year}-${String(nextSequence).padStart(6, "0")}`;
 
+  console.log(
+  "APP URL",
+  process.env.NEXT_PUBLIC_APP_URL
+);
+
   const qrUrl =
-  `${process.env.NEXT_PUBLIC_APP_URL}/vouchers/preview`;
+  `${process.env.NEXT_PUBLIC_APP_URL}/vouchers/${voucherNumber}`;
 
 
   const [voucher] = await db
