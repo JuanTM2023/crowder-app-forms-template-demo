@@ -1,5 +1,6 @@
 import { db } from "@/lib/db";
-import { foodVouchers } from "@/lib/db/schema";
+
+import { foodVouchers, foodVoucherLines } from "@/lib/db/schema";
 
 export async function generateFoodVouchers({
   transactionId,
@@ -18,31 +19,44 @@ export async function generateFoodVouchers({
 }) {
   console.log("GENERATING FOOD VOUCHERS", transactionId);
 
-  await db.insert(foodVouchers).values({
-    voucherNumber: `PRD-${transactionId}`,
+  const [voucher] = await db
+    .insert(foodVouchers)
+    .values({
+      voucherNumber: `PRD-${transactionId}`,
 
-    transactionId,
+      transactionId,
 
-    partnerItemUuid: partnerItems[0]?.uuid ?? "N/A",
+      partnerItemUuid: partnerItems[0]?.uuid ?? "N/A",
 
-    itemUuid: null,
+      itemUuid: null,
 
-    customerName: null,
+      customerName: null,
 
-    eventName: context.eventName,
+      eventName: context.eventName,
 
-    show: context.eventName,
+      show: context.eventName,
 
-    sectorName: null,
+      sectorName: null,
 
-    sectionName: null,
+      sectionName: null,
+
+      productName: partnerItems[0]?.description ?? "PRODUCTO",
+
+      price: partnerItems[0]?.price ?? 0,
+
+      serviceFee: 0,
+
+      status: "pending",
+    })
+    .returning();
+
+  await db.insert(foodVoucherLines).values({
+    voucherId: voucher.id,
 
     productName: partnerItems[0]?.description ?? "PRODUCTO",
 
-    price: partnerItems[0]?.price ?? 0,
+    quantityPurchased: 1,
 
-    serviceFee: 0,
-
-    status: "pending",
+    quantityRedeemed: 0,
   });
 }
