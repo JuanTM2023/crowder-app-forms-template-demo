@@ -19,6 +19,8 @@ export async function generateFoodVouchers({
 }) {
   console.log("GENERATING FOOD VOUCHERS", transactionId);
 
+  console.log("PARTNER ITEMS", JSON.stringify(partnerItems, null, 2));
+
   const [voucher] = await db
     .insert(foodVouchers)
     .values({
