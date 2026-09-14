@@ -21,6 +21,8 @@ export async function generateFoodVouchers({
     show?: string | null;
     sectorName: string;
     sectionName?: string | null;
+    row?: string | null;
+    seat?: string | null;
   }[];
   partnerItems: {
     uuid: string;
@@ -33,6 +35,8 @@ export async function generateFoodVouchers({
   console.log("PARTNER ITEMS", JSON.stringify(partnerItems, null, 2));
 
   const firstItem = items[0];
+
+  console.log("FIRST ITEM", JSON.stringify(firstItem, null, 2));
 
   const customerName =
     [context.user?.firstName, context.user?.lastName]
@@ -59,7 +63,7 @@ export async function generateFoodVouchers({
 
       sectorName: firstItem?.sectorName ?? null,
 
-      sectionName: firstItem?.sectionName ?? null,
+      sectionName: firstItem?.sectionName ?? firstItem?.row ?? null,
 
       productName: partnerItems[0]?.description ?? "PRODUCTO",
 
