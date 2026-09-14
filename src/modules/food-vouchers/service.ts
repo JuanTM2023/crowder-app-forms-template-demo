@@ -38,6 +38,18 @@ export async function generateFoodVouchers({
 
   const firstItem = items[0];
 
+  const showDisplay = firstItem?.show
+    ? new Intl.DateTimeFormat("es-PE", {
+        timeZone: "America/Lima",
+        day: "2-digit",
+        month: "2-digit",
+        year: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+        hour12: false,
+      }).format(new Date(firstItem.show))
+    : null;
+
   console.log("FIRST ITEM", JSON.stringify(firstItem, null, 2));
 
   const customerName =
@@ -75,7 +87,7 @@ export async function generateFoodVouchers({
 
       eventName: context.eventName,
 
-      show: firstItem?.show ?? null,
+      show: showDisplay,
 
       sectorName: firstItem?.sectorName ?? null,
 
