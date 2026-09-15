@@ -41,6 +41,16 @@ export async function generateFoodVouchers({
 
   const firstItem = items[0];
 
+  console.log(
+  "ITEMS",
+  JSON.stringify(items, null, 2),
+);
+
+console.log(
+  "FIRST ITEM",
+  JSON.stringify(firstItem, null, 2),
+);
+
   const showDisplay = firstItem?.show
     ? new Intl.DateTimeFormat("es-PE", {
         timeZone: "America/Lima",

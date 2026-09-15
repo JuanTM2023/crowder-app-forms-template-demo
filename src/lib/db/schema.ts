@@ -717,6 +717,10 @@ export const foodVouchers = pgTable("food_vouchers", {
 
   sectionName: text("section_name"),
 
+  row: text("row"),
+
+seat: text("seat"),
+
   productName: text("product_name").notNull(),
 
   price: doublePrecision("price").notNull(),
