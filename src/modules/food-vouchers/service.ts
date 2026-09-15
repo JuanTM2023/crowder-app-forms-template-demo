@@ -7,6 +7,7 @@ import { desc } from "drizzle-orm";
 import { sendVoucherEmail } from "@/services/food-voucher-email";
 
 export async function generateFoodVouchers({
+
   transactionId,
   context,
   items,
@@ -36,6 +37,8 @@ export async function generateFoodVouchers({
   }[];
 }) {
   console.log("GENERATING FOOD VOUCHERS", transactionId);
+
+  console.log("FULL CONTEXT", JSON.stringify(context, null, 2),);
 
   console.log("PARTNER ITEMS", JSON.stringify(partnerItems, null, 2));
 
