@@ -4,6 +4,8 @@ import { foodVouchers, foodVoucherLines } from "@/lib/db/schema";
 
 import { desc } from "drizzle-orm";
 
+import { sendVoucherEmail } from "@/services/food-voucher-email";
+
 export async function generateFoodVouchers({
   transactionId,
   context,
@@ -14,6 +16,7 @@ export async function generateFoodVouchers({
   context: {
     eventName: string;
     user?: {
+      email?: string | null;
       firstName?: string | null;
       lastName?: string | null;
     } | null;
@@ -58,6 +61,9 @@ export async function generateFoodVouchers({
       .join(" ")
       .trim() || null;
 
+  const customerEmail =
+context.user?.email ?? null;    
+
   const lastVoucher = await db
     .select()
     .from(foodVouchers)
@@ -90,6 +96,8 @@ console.log("APP URL =", process.env.APP_URL);
       itemUuid: null,
 
       customerName: customerName,
+
+      customerEmail: customerEmail,
 
       eventName: context.eventName,
 
@@ -142,4 +150,14 @@ console.log("APP URL =", process.env.APP_URL);
       quantityRedeemed: 0,
     })),
   );
+
+  if (
+  customerEmail
+) {
+  await sendVoucherEmail({
+    email: customerEmail,
+    voucherNumber:
+      voucher.voucherNumber,
+  });
+}
 }
