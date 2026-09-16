@@ -48,11 +48,11 @@ export async function sendVoucherEmail({
 <p>
   <a
     href="${voucherUrl}"
+    target="_blank"
     style="
       background-color:#2563eb;
       color:#ffffff;
-      padding:12px 20px;
-      ticketmaster Perú
+    oucherUrlp>
   </p>
 </div>
 `,
