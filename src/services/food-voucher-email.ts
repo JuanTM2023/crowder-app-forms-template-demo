@@ -45,14 +45,14 @@ export async function sendVoucherEmail({
     Puede acceder utilizando el siguiente botón:
   </p>
 
-  <p>
-    <a
-      href="${voucherUrl}"
-      style="
-        background-color:#2563eb;
-        color:#ffffff;
-        padding:12px 20px;
-        textaster Perú
+<p>
+  <a
+    href="${voucherUrl}"
+    style="
+      background-color:#2563eb;
+      color:#ffffff;
+      padding:12px 20px;
+      ticketmaster Perú
   </p>
 </div>
 `,
