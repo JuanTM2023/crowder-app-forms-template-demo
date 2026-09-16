@@ -39,7 +39,7 @@ import type {
   ValidationError,
 } from "./types";
 
-import { generateFoodVouchers } from "@/modules/food-vouchers/service";
+//import { generateFoodVouchers } from "@/modules/food-vouchers/service";
 
 type PublishedEntry = {
   definition: FormDefinition;
@@ -259,12 +259,12 @@ export async function submitBatch(input: {
     return tx.insert(submissionsTable).values(rows).returning();
   });
 
-  await generateFoodVouchers({
-    transactionId,
-    context,
-    items: context.items,
-    partnerItems,
-  });
+  //await generateFoodVouchers({
+  //  transactionId,
+  //  context,
+  //  items: context.items,
+  //  partnerItems,
+  //});
 
   return { transactionId, submissions: inserted, partnerItems };
 }
