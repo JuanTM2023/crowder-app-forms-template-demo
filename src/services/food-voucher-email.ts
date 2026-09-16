@@ -22,45 +22,39 @@ export async function sendVoucherEmail({
     subject: `Food Voucher ${voucherNumber}`,
 
     html: `
-      <div
-        style="
-          font-family: Arial, sans-serif;
-          max-width: 600px;
-          margin: 0 auto;
-          padding: 20px;
-        "
-      >
-        <h1>Food Voucher</h1>
+<div
+  style="
+    font-family: Arial, sans-serif;
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 20px;
+  "
+>
+  <h1>Food Voucher</h1>
 
-        <p>
-          Su voucher ha sido generado correctamente.
-        </p>
+  <p>
+    Su voucher ha sido generado correctamente.
+  </p>
 
-        <p>
-          <strong>Voucher:</strong>
-          ${voucherNumber}
-        </p>
+  <p>
+    <strong>Voucher:</strong>
+    ${voucherNumber}
+  </p>
 
-        <p>
-          Puede acceder utilizando el siguiente botón:
-        </p>
+  <p>
+    Puede acceder utilizando el siguiente botón:
+  </p>
 
-        <div style="margin-top: 30px;">
-          <a
-            href="${voucherUrl}"
-            style="
-              background: #2563eb;
-            x; margin-bottom: 20px;" />
-
-        <p
-          style="
-            color: #6b7280;
-            font-size: 12px;
-          "
-        >
-          Ticketmaster Perú
-        </p>
-      </div>
-    `,
+  <p>
+    <a
+      href="${voucherUrl}"
+      style="
+        background-color:#2563eb;
+        color:#ffffff;
+        padding:12px 20px;
+        textaster Perú
+  </p>
+</div>
+`,
   });
 }
