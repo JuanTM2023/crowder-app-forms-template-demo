@@ -2,7 +2,7 @@ import { db } from "@/lib/db";
 
 import { foodVouchers, foodVoucherLines } from "@/lib/db/schema";
 
-import { desc } from "drizzle-orm";
+import { desc, eq } from "drizzle-orm";
 
 import { sendVoucherEmail } from "@/services/food-voucher-email";
 
@@ -93,9 +93,6 @@ context.user?.email ?? null;
 
 console.log("APP URL =", process.env.APP_URL);
 
-  const qrUrl =
-  `${process.env.APP_URL}/vouchers/${voucherNumber}`;
-
 
   const [voucher] = await db
     .insert(foodVouchers)
@@ -126,11 +123,21 @@ console.log("APP URL =", process.env.APP_URL);
 
       serviceFee: 0,
 
-      qrUrl: qrUrl,
-
       status: "pending",
     })
     .returning();
+
+    const qrUrl =
+  `${process.env.APP_URL}/vouchers/${voucher.publicToken}`;
+
+  await db
+  .update(foodVouchers)
+  .set({
+    qrUrl,
+  })
+  .where(
+    eq(foodVouchers.id, voucher.id)
+  );
 
   const grouped = new Map<string, { productName: string; quantity: number }>();
 
