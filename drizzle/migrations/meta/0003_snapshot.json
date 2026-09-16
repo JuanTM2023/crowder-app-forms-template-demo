@@ -1,6 +1,6 @@
 {
-  "id": "61bb5d12-d350-4824-9b57-100b173648b1",
-  "prevId": "8525b9c8-0db3-4a69-8d17-abc01afd9617",
+  "id": "77960a66-0687-40ba-96cb-bed61121a8a0",
+  "prevId": "a713d0b3-551a-4fa6-9727-cbd22c270494",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
@@ -437,6 +437,13 @@
           "primaryKey": false,
           "notNull": true
         },
+        "public_token": {
+          "name": "public_token",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
         "transaction_id": {
           "name": "transaction_id",
           "type": "text",
@@ -485,6 +492,18 @@
           "primaryKey": false,
           "notNull": false
         },
+        "row": {
+          "name": "row",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "seat": {
+          "name": "seat",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
         "product_name": {
           "name": "product_name",
           "type": "text",
@@ -503,6 +522,30 @@
           "primaryKey": false,
           "notNull": true,
           "default": 0
+        },
+        "customer_email": {
+          "name": "customer_email",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "qr_url": {
+          "name": "qr_url",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "table_number": {
+          "name": "table_number",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "redeemed_by": {
+          "name": "redeemed_by",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
         },
         "status": {
           "name": "status",
@@ -542,7 +585,15 @@
         }
       },
       "compositePrimaryKeys": {},
-      "uniqueConstraints": {},
+      "uniqueConstraints": {
+        "food_vouchers_public_token_unique": {
+          "name": "food_vouchers_public_token_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "public_token"
+          ]
+        }
+      },
       "policies": {},
       "checkConstraints": {},
       "isRLSEnabled": false

@@ -697,6 +697,11 @@ export const foodVouchers = pgTable("food_vouchers", {
 
   voucherNumber: text("voucher_number").notNull(),
 
+  publicToken: uuid("public_token")
+  .defaultRandom()
+  .notNull()
+  .unique(),
+
   transactionId: text("transaction_id")
     .notNull()
     .references(() => transactions.id, {
