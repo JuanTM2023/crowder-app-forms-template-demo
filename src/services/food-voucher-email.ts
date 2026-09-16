@@ -16,9 +16,6 @@ export async function sendVoucherEmail({
   const voucherUrl =
     `${process.env.APP_URL}/vouchers/${publicToken}`;
 
-  //const pdfUrl =
-  //  `${process.env.APP_URL}/api/vouchers/${publicToken}/pdf`;
-
   await resend.emails.send({
     from: process.env.FROM_EMAIL!,
     to: email,
@@ -33,9 +30,7 @@ export async function sendVoucherEmail({
           padding: 20px;
         "
       >
-        <h1>
-          Food Voucher
-        </h1>
+        <h1>Food Voucher</h1>
 
         <p>
           Su voucher ha sido generado correctamente.
@@ -47,21 +42,21 @@ export async function sendVoucherEmail({
         </p>
 
         <p>
-          Puede acceder utilizando los siguientes botones:
+          Puede acceder utilizando el siguiente botón:
         </p>
 
         <div style="margin-top: 30px;">
-
           <a
             href="${voucherUrl}"
             style="
               background: #2563eb;
-              color: white;
-           background: #16a34a;
-              color: white;
-              padding: 12px 20px;
-              text-decoration: none;
-              border-radius: 6px;        "
+            x; margin-bottom: 20px;" />
+
+        <p
+          style="
+            color: #6b7280;
+            font-size: 12px;
+          "
         >
           Ticketmaster Perú
         </p>

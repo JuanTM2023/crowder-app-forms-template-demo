@@ -176,10 +176,8 @@ console.log("APP URL =", process.env.APP_URL);
 ) {
 await sendVoucherEmail({
   email: customerEmail,
-  voucherNumber:
-    voucher.voucherNumber,
-  publicToken:
-    voucher.publicToken,
+  voucherNumber: voucher.voucherNumber,
+  publicToken: voucher.publicToken,
 });
 }
 }
