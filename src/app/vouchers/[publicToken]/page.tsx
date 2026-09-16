@@ -7,15 +7,15 @@ export default async function VoucherPage({
   params,
 }: {
   params: Promise<{
-    voucherNumber: string;
+    publicToken: string;
   }>;
 }) {
-  const { voucherNumber } = await params;
+  const { publicToken } = await params;
 
   const voucher = await db.query.foodVouchers.findFirst({
     where: eq(
-      foodVouchers.voucherNumber,
-      voucherNumber,
+      foodVouchers.publicToken,
+      publicToken,
     ),
   });
 
