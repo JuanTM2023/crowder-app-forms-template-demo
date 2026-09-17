@@ -18,6 +18,9 @@ import {
 
 import * as repo from "./repository"
 
+import { generateFoodVouchers } from "@/modules/food-vouchers/service"
+import { listByTransaction } from "@/modules/submissions"
+
 export type WebhookStatus =
   | "purchaseReserved"
   | "purchasePaid"
@@ -80,27 +83,71 @@ export async function handle(input: {
       body = { status: "reserved", expiresAt: next.expiresAt!.toISOString() }
       break
     }
-    case "purchasePaid": {
-      const purchase = input.payload.purchase as
-        | { id: number; amount: number }
-        | undefined
-      if (!purchase) {
-        throw new DomainError("invalid_payload", "missing purchase in purchasePaid")
-      }
-      await markConfirmed(input.transactionId, {
-        purchaseId: purchase.id,
-        purchaseAmount: purchase.amount,
-      })
-      // Fulfillment: hold→consumed y descuento real de stock (sección 9.3).
-      await confirmStock(input.transactionId)
-      
-      console.log(
-  "PURCHASE PAID WEBHOOK",
-  input.transactionId,
-)
-      body = { status: "confirmed" }
-      break
-    }
+case "purchasePaid": {
+  const purchase = input.payload.purchase as
+    | { id: number; amount: number }
+    | undefined
+
+  if (!purchase) {
+    throw new DomainError(
+      "invalid_payload",
+      "missing purchase in purchasePaid",
+    )
+  }
+
+  await markConfirmed(input.transactionId, {
+    purchaseId: purchase.id,
+    purchaseAmount: purchase.amount,
+  })
+
+  await confirmStock(input.transactionId)
+
+  console.log(
+    "PURCHASE PAID WEBHOOK",
+    input.transactionId,
+  )
+
+  const confirmedTxn =
+    await requireById(
+      input.transactionId,
+    )
+
+  const submissions =
+    await listByTransaction(
+      input.transactionId,
+    )
+
+const items = submissions
+  .map((s) => s.itemSnapshot)
+  .filter(
+    (item): item is NonNullable<typeof item> =>
+      item != null,
+  )
+
+  await generateFoodVouchers({
+    transactionId:
+      input.transactionId,
+
+    context: {
+      eventName:
+        confirmedTxn.eventName,
+
+      user:
+        confirmedTxn.userSnapshot,
+    },
+
+    items,
+
+    partnerItems:
+      confirmedTxn.partnerItems,
+  })
+
+  body = {
+    status: "confirmed",
+  }
+
+  break
+}
 
     
     case "purchaseExpired": {
