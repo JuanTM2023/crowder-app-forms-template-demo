@@ -93,9 +93,16 @@ export async function handle(input: {
       })
       // Fulfillment: hold→consumed y descuento real de stock (sección 9.3).
       await confirmStock(input.transactionId)
+      
+      console.log(
+  "PURCHASE PAID WEBHOOK",
+  input.transactionId,
+)
       body = { status: "confirmed" }
       break
     }
+
+    
     case "purchaseExpired": {
       await markExpired(input.transactionId)
       // El hold venció sin pago: liberar la reserva (sección 9.3).
