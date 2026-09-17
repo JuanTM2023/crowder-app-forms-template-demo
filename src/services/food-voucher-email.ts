@@ -21,15 +21,8 @@ export async function sendVoucherEmail({
     to: email,
     subject: `Food Voucher ${voucherNumber}`,
 
-    html: `
-<div
-  style="
-    font-family: Arial, sans-serif;
-    max-width: 600px;
-    margin: 0 auto;
-    padding: 20px;
-  "
->
+html: `
+<div>
   <h1>Food Voucher</h1>
 
   <p>
@@ -37,22 +30,17 @@ export async function sendVoucherEmail({
   </p>
 
   <p>
-    <strong>Voucher:</strong>
-    ${voucherNumber}
+    Voucher: ${voucherNumber}
   </p>
 
   <p>
-    Puede acceder utilizando el siguiente botón:
+    Ver Voucher:
   </p>
 
-<p>
-  <a
-    href="${voucherUrl}"
-    target="_blank"
-    style="
-      background-color:#2563eb;
-      color:#ffffff;
-    oucherUrlp>
+  <p>
+    ${voucherUrl}
+      ${voucherUrl}
+    </a>
   </p>
 </div>
 `,
