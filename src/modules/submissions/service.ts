@@ -250,6 +250,7 @@ export async function submitBatch(input: {
       eventName: context.eventName,
       locale: context.locale ?? null,
       userSnapshot: context.user ?? null,
+      itemsSnapshot: context.items,
       buyerEmail: context.user?.email ?? null,
       buyerFirstName: context.user?.firstName ?? null,
       buyerLastName: context.user?.lastName ?? null,

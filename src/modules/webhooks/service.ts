@@ -19,7 +19,6 @@ import {
 import * as repo from "./repository"
 
 import { generateFoodVouchers } from "@/modules/food-vouchers/service"
-import { listByTransaction } from "@/modules/submissions"
 
 export type WebhookStatus =
   | "purchaseReserved"
@@ -112,17 +111,8 @@ case "purchasePaid": {
       input.transactionId,
     )
 
-  const submissions =
-    await listByTransaction(
-      input.transactionId,
-    )
-
-const items = submissions
-  .map((s) => s.itemSnapshot)
-  .filter(
-    (item): item is NonNullable<typeof item> =>
-      item != null,
-  )
+const items =
+  confirmedTxn.itemsSnapshot ?? [];
 
   await generateFoodVouchers({
     transactionId:

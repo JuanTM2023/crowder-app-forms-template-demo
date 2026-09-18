@@ -484,6 +484,8 @@ export const transactions = pgTable(
     // Denormalized buyer identity, copied from userSnapshot at submit time so
     // support search can hit btree/trigram indexes instead of scanning JSONB.
     // userSnapshot remains the source of truth; these are search index only.
+    itemsSnapshot: jsonb("items_snapshot")
+  .$type<ItemSnapshot[]>(),
     buyerEmail: text("buyer_email"),
     buyerFirstName: text("buyer_first_name"),
     buyerLastName: text("buyer_last_name"),
