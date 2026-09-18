@@ -74,25 +74,6 @@ html: `
     </tr>
   </table>
 
-<table cellpadding="0" cellspacing="0" border="0">
-  <tr>
-
-    <td bgcolor="#2563eb" style="border-radius:6px;">
-      <a
-        href="${voucherUrl}"
-        style="
-          display:inline-block;
-          padding:12px 20px;
-          color:#ffffff;
-          text-decoration:none;
-          font-weight:bold;
-          font-family:Arial,sans-serif;
-       20px;
-          color:#ffffff;
-          text-decoration:none;
-          font-weight:bold;
-          font
-
   <hr>
 
   <p style="font-size:12px;color:#666;">
