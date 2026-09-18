@@ -171,13 +171,40 @@ console.log("APP URL =", process.env.APP_URL);
     })),
   );
 
-  if (
-  customerEmail
-) {
-await sendVoucherEmail({
-  email: customerEmail,
-  voucherNumber: voucher.voucherNumber,
-  publicToken: voucher.publicToken,
-});
+console.log(
+  "CUSTOMER EMAIL",
+  customerEmail,
+);
+
+if (customerEmail) {
+
+  console.log(
+    "ABOUT TO SEND EMAIL",
+    voucher.voucherNumber,
+    customerEmail,
+  );
+
+  try {
+
+    await sendVoucherEmail({
+      email: customerEmail,
+      voucherNumber: voucher.voucherNumber,
+      publicToken: voucher.publicToken,
+    });
+
+    console.log(
+      "EMAIL SENT",
+      voucher.voucherNumber,
+    );
+
+  } catch (error) {
+
+    console.error(
+      "EMAIL ERROR",
+      error,
+    );
+
+    throw error;
+  }
 }
 }
