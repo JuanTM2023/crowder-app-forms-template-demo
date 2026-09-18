@@ -240,7 +240,7 @@ export function derivePartnerItems(
             description: "Cargo por servicio",
             price: serviceFee,
             quantity: 1,
-            refundable: false,
+            refundable: true,
           });
         }
       }
