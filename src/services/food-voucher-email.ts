@@ -41,28 +41,33 @@ export async function sendVoucherEmail({
           Puede acceder a su voucher utilizando los siguientes botones:
         </p>
 
-        <table cellpadding="0" cellspacing="0" border="0">
-          <tr>
+ <table role="presentation" cellspacing="0" cellpadding="0" border="0">
+  <tr>
 
-            <td>
-              ${voucherUrl}
-                Ver Voucher
-              </a>
-            </td>
+    <td
+      bgcolor="#2563eb"
+      style="
+        border-radius:6px;
+        text-align:center;
+      "
+    >
+      <a
+        href="${voucherUrl}"
+        style="
+          display:inline-block;
+          padding:12px 24px;
+          color:#ffffff;
+          font-weight:bold;
+          text-ter;
+      "
+    >
+      ${pdfUrl}
+        Descargar PDF
+      </a>
+    </td>
 
-            <td width="15"></td>
-
-            <td>
-              <a
-                href="${pdfUrl}"
-                style="
-                  background-color:#16a34a;
-                  color:#ffffff;
-                  text- <p style="font-size:12px;color:#666;">
-          Ticketmaster Perú
-        </p>
-
-      </div>
-    `,
+  </tr>
+</table>
+`,
   });
 }
