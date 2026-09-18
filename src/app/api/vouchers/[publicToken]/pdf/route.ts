@@ -12,20 +12,20 @@ export async function GET(
   {
     params,
   }: {
-    params: Promise<{
-      voucherNumber: string;
-    }>;
+params: Promise<{
+  publicToken: string;
+}>;
   },
 ) {
-  const { voucherNumber } = await params;
+  const { publicToken } = await params;
 
-  const voucher =
-    await db.query.foodVouchers.findFirst({
-      where: eq(
-        foodVouchers.voucherNumber,
-        voucherNumber,
-      ),
-    });
+const voucher =
+  await db.query.foodVouchers.findFirst({
+    where: eq(
+      foodVouchers.publicToken,
+      publicToken,
+    ),
+  });
 
   if (!voucher) {
     return new Response(
