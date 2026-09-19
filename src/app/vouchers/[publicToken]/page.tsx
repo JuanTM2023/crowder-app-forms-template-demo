@@ -60,7 +60,8 @@ export default async function VoucherPage({
         <div
           style={{
             padding: "16px",
-            backgroundColor: "#dcfce7",
+            backgroundColor: "#16a34a",
+            color: "#ffffff",
             borderRadius: "8px",
             marginTop: "20px",
           }}
