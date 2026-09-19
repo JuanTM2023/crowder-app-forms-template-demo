@@ -55,25 +55,6 @@ export default async function VoucherPage({
 
       <p><strong>Estado:</strong> {voucher.status}</p>
 
-      {/* Corregido: Se cerró la etiqueta <form> correctamente */}
-      {voucher.status === "pending" && (
-        <form action={`/api/vouchers/${voucher.publicToken}/redeem`} method="POST">
-          <button
-            type="submit"
-            style={{
-              padding: "12px 24px",
-              backgroundColor: "#16a34a",
-              color: "white",
-              border: "none",
-              borderRadius: "6px",
-              cursor: "pointer",
-              fontWeight: "bold",
-            }}
-          >
-            CANJEAR VOUCHER
-          </button>
-        </form>
-      )}
 
       {voucher.status === "redeemed" && (
         <div
