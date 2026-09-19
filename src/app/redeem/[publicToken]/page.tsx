@@ -60,7 +60,7 @@ export default async function RedeemPage({
             style={{
               padding: "12px 24px",
               backgroundColor: "#16a34a",
-              color: "grey",
+              color: "whitw",
               border: "none",
               borderRadius: "6px",
               cursor: "pointer",
@@ -77,6 +77,7 @@ export default async function RedeemPage({
           style={{
             padding: "16px",
             backgroundColor: "#dcfce7",
+            color: "#9B9B9B",
             borderRadius: "8px",
             marginTop: "20px",
             maxWidth: "500px",
