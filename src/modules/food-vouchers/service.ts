@@ -127,10 +127,10 @@ console.log("APP URL =", process.env.APP_URL);
     })
     .returning();
 
-    const qrUrl =
-  `${process.env.APP_URL}/vouchers/${voucher.publicToken}`;
+const qrUrl =
+  `${process.env.APP_URL}/redeem/${voucher.publicToken}`;
 
-  await db
+await db
   .update(foodVouchers)
   .set({
     qrUrl,
