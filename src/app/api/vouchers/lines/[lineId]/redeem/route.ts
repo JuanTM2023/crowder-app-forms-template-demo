@@ -2,8 +2,11 @@ import { db } from "@/lib/db";
 import {
   foodVoucherLines,
   foodVoucherRedemptions,
+  foodVouchers,
 } from "@/lib/db/schema";
 import { eq } from "drizzle-orm";
+
+import { revalidatePath } from "next/cache";
 
 export async function POST(
   request: Request,
@@ -47,6 +50,7 @@ export async function POST(
         lineId,
       ),
     );
+    
 
   await db
     .insert(
@@ -58,6 +62,21 @@ export async function POST(
       quantity: 1,
       redeemedBy: "LOCAL",
     });
+
+    await db
+  .update(foodVouchers)
+  .set({
+    redeemedAt: new Date(),
+    redeemedBy: "LOCAL",
+  })
+  .where(
+    eq(
+      foodVouchers.id,
+      line.voucherId,
+    ),
+  );
+
+    revalidatePath("/admin/vouchers");
 
   return Response.redirect(
     request.headers.get(
