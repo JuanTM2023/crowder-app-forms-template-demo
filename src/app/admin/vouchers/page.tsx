@@ -1,9 +1,62 @@
 import { db } from "@/lib/db";
 
+import { 
+  foodVoucherLines,
+} from "@/lib/db/schema";
+
+import { eq } from "drizzle-orm";
+
 export const dynamic = "force-dynamic";
 
 export default async function AdminVouchersPage() {
-  const vouchers = await db.query.foodVouchers.findMany();
+const vouchers =
+  await db.query.foodVouchers.findMany();
+
+const vouchersWithStatus =
+  await Promise.all(
+    vouchers.map(async (voucher) => {
+
+      const lines =
+        await db.query.foodVoucherLines.findMany({
+          where: eq(
+            foodVoucherLines.voucherId,
+            voucher.id,
+          ),
+        });
+
+      const allRedeemed =
+        lines.length > 0 &&
+        lines.every(
+          (line) =>
+            line.quantityRedeemed >=
+            line.quantityPurchased,
+        );
+
+      const partiallyRedeemed =
+        lines.some(
+          (line) =>
+            line.quantityRedeemed > 0,
+        );
+
+      let calculatedStatus =
+        "pending";
+
+      if (allRedeemed) {
+        calculatedStatus =
+          "redeemed";
+      } else if (
+        partiallyRedeemed
+      ) {
+        calculatedStatus =
+          "partial";
+      }
+
+      return {
+        ...voucher,
+        calculatedStatus,
+      };
+    }),
+  );
 
   return (
     <div style={{ padding: 40, fontFamily: "sans-serif", backgroundColor: "#111827", minHeight: "100vh" }}>
@@ -31,7 +84,7 @@ export default async function AdminVouchersPage() {
           </thead>
 
           <tbody>
-            {vouchers.map((voucher) => (
+           {vouchersWithStatus.map((voucher) => (
               <tr 
                 key={voucher.id} 
                 style={{ borderBottom: "1px solid #374151" }}
@@ -72,15 +125,24 @@ export default async function AdminVouchersPage() {
                     borderRadius: "4px",
                     fontSize: "14px",
                     fontWeight: "500",
-                    backgroundColor: 
-                      voucher.status === "redeemed" ? "#def7ec" : 
-                      voucher.status === "pending" ? "#fef3c7" : "#e5e7eb",
-                    color: 
-                      voucher.status === "redeemed" ? "#03543f" : 
-                      voucher.status === "pending" ? "#78350f" : "#374151"
+                   backgroundColor:
+  voucher.calculatedStatus === "redeemed"
+    ? "#def7ec"
+    : voucher.calculatedStatus === "partial"
+    ? "#dbeafe"
+    : "#fef3c7",
+color:
+  voucher.calculatedStatus === "redeemed"
+    ? "#03543f"
+    : voucher.calculatedStatus === "partial"
+    ? "#1e40af"
+    : "#78350f"
                   }}>
-                    {voucher.status === "redeemed" ? "Canjeado" : 
-                     voucher.status === "pending" ? "Pendiente" : voucher.status}
+{voucher.calculatedStatus === "redeemed"
+  ? "Canjeado"
+  : voucher.calculatedStatus === "partial"
+  ? "Parcial"
+  : "Pendiente"}
                   </span>
                 </td>
                 <td style={{ padding: "12px 16px" }}>
