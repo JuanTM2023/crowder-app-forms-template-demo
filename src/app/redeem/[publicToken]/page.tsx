@@ -6,9 +6,7 @@ import QRCode from "qrcode";
 export default async function RedeemPage({
   params,
 }: {
-  params: Promise<{
-    publicToken: string;
-  }>;
+  params: Promise<{ publicToken: string }>;
 }) {
   const { publicToken } = await params;
 
@@ -24,9 +22,7 @@ export default async function RedeemPage({
     );
   }
 
-  const qrCode = voucher.qrUrl
-    ? await QRCode.toDataURL(voucher.qrUrl)
-    : null;
+  const qrCode = voucher.qrUrl ? await QRCode.toDataURL(voucher.qrUrl) : null;
 
   const lines = await db.query.foodVoucherLines.findMany({
     where: eq(foodVoucherLines.voucherId, voucher.id),
@@ -35,14 +31,12 @@ export default async function RedeemPage({
   return (
     <div style={{ padding: 40 }}>
       <h1>VALIDACIÓN DE VOUCHER</h1>
-
       <p><strong>Voucher:</strong> {voucher.voucherNumber}</p>
       <p><strong>Cliente:</strong> {voucher.customerName}</p>
       <p><strong>Evento:</strong> {voucher.eventName}</p>
       <p><strong>Fecha:</strong> {voucher.show}</p>
       <p><strong>Sector:</strong> {voucher.sectorName}</p>
 
-      {/* Corregido: Renderizado correcto del QR inyectando el string en src */}
       {qrCode && (
         <div style={{ marginTop: "20px", marginBottom: "20px" }}>
           {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -52,7 +46,6 @@ export default async function RedeemPage({
 
       <p><strong>Estado:</strong> {voucher.status}</p>
 
-      {/* Corregido: Reconstrucción limpia del formulario de envío */}
       {voucher.status === "pending" && (
         <form action={`/api/vouchers/${voucher.publicToken}/redeem`} method="POST">
           <button
@@ -86,9 +79,7 @@ export default async function RedeemPage({
           <strong>✅ Voucher Canjeado</strong>
           <p>
             Fecha:{" "}
-            {voucher.redeemedAt
-              ? new Date(voucher.redeemedAt).toLocaleString()
-              : "-"}
+            {voucher.redeemedAt ? new Date(voucher.redeemedAt).toLocaleString() : "-"}
           </p>
           <p>Usuario: {voucher.redeemedBy}</p>
         </div>
@@ -97,13 +88,45 @@ export default async function RedeemPage({
       <hr style={{ marginTop: "30px", marginBottom: "20px" }} />
 
       <h2>Productos</h2>
-      <ul>
+      <div>
         {lines.map((line) => (
-          <li key={line.id}>
-            {line.quantityPurchased} x {line.productName}
-          </li>
+          <div
+            key={line.id}
+            style={{
+              border: "1px solid #374151",
+              padding: "12px",
+              marginBottom: "12px",
+              borderRadius: "8px",
+            }}
+          >
+            <strong>{line.productName}</strong>
+            <p>Comprado: {line.quantityPurchased}</p>
+            <p>Canjeado: {line.quantityRedeemed}</p>
+
+            {line.quantityRedeemed < line.quantityPurchased && (
+              <form action={`/api/vouchers/lines/${line.id}/redeem`} method="POST">
+                <button
+                  type="submit"
+                  style={{
+                    padding: "8px 16px",
+                    background: "#2563eb",
+                    color: "white",
+                    border: "none",
+                    borderRadius: "6px",
+                    cursor: "pointer",
+                  }}
+                >
+                  ENTREGAR
+                </button>
+              </form>
+            )}
+
+            {line.quantityRedeemed >= line.quantityPurchased && (
+              <p>✅ Entregado completamente</p>
+            )}
+          </div>
         ))}
-      </ul>
+      </div>
     </div>
   );
 }
