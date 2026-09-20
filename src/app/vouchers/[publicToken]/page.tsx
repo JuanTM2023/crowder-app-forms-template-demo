@@ -36,6 +36,16 @@ export default async function VoucherPage({
     where: eq(foodVoucherLines.voucherId, voucher.id),
   });
 
+  const allRedeemed = lines.every(
+  (line) =>
+    line.quantityRedeemed >=
+    line.quantityPurchased,
+);
+
+const partiallyRedeemed = lines.some(
+  (line) => line.quantityRedeemed > 0,
+);
+
   return (
     <div style={{ padding: 40 }}>
       <h1>FOOD VOUCHER</h1>
@@ -53,7 +63,14 @@ export default async function VoucherPage({
         </div>
       )}
 
-      <p><strong>Estado:</strong> {voucher.status}</p>
+    <p>
+  <strong>Estado:</strong>{" "}
+  {allRedeemed
+    ? "✅ Canjeado"
+    : partiallyRedeemed
+    ? "🟡 Parcial"
+    : "⏳ Pendiente"}
+</p>
 
 
       {voucher.status === "redeemed" && (

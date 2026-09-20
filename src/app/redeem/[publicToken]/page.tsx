@@ -28,6 +28,16 @@ export default async function RedeemPage({
     where: eq(foodVoucherLines.voucherId, voucher.id),
   });
 
+  const allRedeemed = lines.every(
+  (line) =>
+    line.quantityRedeemed >=
+    line.quantityPurchased,
+);
+
+const partiallyRedeemed = lines.some(
+  (line) => line.quantityRedeemed > 0,
+);
+
   return (
     <div style={{ padding: 40 }}>
       <h1>VALIDACIÓN DE VOUCHER</h1>
@@ -44,26 +54,16 @@ export default async function RedeemPage({
         </div>
       )}
 
-      <p><strong>Estado:</strong> {voucher.status}</p>
+      <p>
+  <strong>Estado:</strong>{" "}
+  {allRedeemed
+    ? "✅ Canjeado"
+    : partiallyRedeemed
+    ? "🟡 Parcial"
+    : "⏳ Pendiente"}
+</p>
 
-      {voucher.status === "pending" && (
-        <form action={`/api/vouchers/${voucher.publicToken}/redeem`} method="POST">
-          <button
-            type="submit"
-            style={{
-              padding: "12px 24px",
-              backgroundColor: "#16a34a",
-              color: "white",
-              border: "none",
-              borderRadius: "6px",
-              cursor: "pointer",
-              fontWeight: "bold",
-            }}
-          >
-            CANJEAR VOUCHER
-          </button>
-        </form>
-      )}
+
 
       {voucher.status === "redeemed" && (
         <div
