@@ -7,7 +7,7 @@ export default async function AdminVouchersPage() {
 
   return (
     <div style={{ padding: 40, fontFamily: "sans-serif" }}>
-      <h1 style={{ marginBottom: "20px", color: "#111827" }}>
+      <h1 style={{ marginBottom: "20px", color: "#ffffff" }}>
         Reporte de Vouchers
       </h1>
 
@@ -15,12 +15,12 @@ export default async function AdminVouchersPage() {
         <table style={{ width: "100%", borderCollapse: "collapse", textAlign: "left" }}>
           <thead>
             <tr style={{ backgroundColor: "#f3f4f6", borderBottom: "2px solid #e5e7eb" }}>
-              <th style={{ padding: "12px 16px", fontWeight: "600", color: "#374151" }}>Voucher</th>
-              <th style={{ padding: "12px 16px", fontWeight: "600", color: "#374151" }}>Orden ID</th>
-              <th style={{ padding: "12px 16px", fontWeight: "600", color: "#374151" }}>Cliente</th>
-              <th style={{ padding: "12px 16px", fontWeight: "600", color: "#374151" }}>Evento</th>
-              <th style={{ padding: "12px 16px", fontWeight: "600", color: "#374151" }}>Sector</th>
-              <th style={{ padding: "12px 16px", fontWeight: "600", color: "#374151" }}>Estado</th>
+              <th style={{ padding: "12px 16px", fontWeight: "600", color: "#ffffff" }}>Voucher</th>
+              <th style={{ padding: "12px 16px", fontWeight: "600", color: "#ffffff" }}>Orden ID</th>
+              <th style={{ padding: "12px 16px", fontWeight: "600", color: "#ffffff" }}>Cliente</th>
+              <th style={{ padding: "12px 16px", fontWeight: "600", color: "#ffffff" }}>Evento</th>
+              <th style={{ padding: "12px 16px", fontWeight: "600", color: "#ffffff" }}>Sector</th>
+              <th style={{ padding: "12px 16px", fontWeight: "600", color: "#ffffff" }}>Estado</th>
             </tr>
           </thead>
 
@@ -33,17 +33,20 @@ export default async function AdminVouchersPage() {
                 <td style={{ padding: "12px 16px", color: "#1f2937", fontWeight: "500" }}>
                   {voucher.voucherNumber}
                 </td>
-                <td style={{ padding: "12px 16px", color: "#4b5563" }}>
+                <td style={{ padding: "12px 16px", color: "#ffffff" }}>
                   {voucher.transactionId}
                 </td>
-                <td style={{ padding: "12px 16px", color: "#1f2937" }}>
+                <td style={{ padding: "12px 16px", color: "#ffffff" }}>
                   {voucher.customerName}
                 </td>
-                <td style={{ padding: "12px 16px", color: "#4b5563" }}>
+                <td style={{ padding: "12px 16px", color: "#ffffff" }}>
                   {voucher.eventName}
                 </td>
-                <td style={{ padding: "12px 16px", color: "#4b5563" }}>
+                <td style={{ padding: "12px 16px", color: "#ffffff" }}>
                   {voucher.sectorName}
+                </td>
+                <td style={{ padding: "12px 16px", color: "#ffffff" }}>
+                  {voucher.sectionName}
                 </td>
                 <td style={{ padding: "12px 16px" }}>
                   <span style={{
