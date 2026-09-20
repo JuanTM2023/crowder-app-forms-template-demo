@@ -6,6 +6,8 @@ import {
 
 import { eq } from "drizzle-orm";
 
+import AutoRefresh from "./AutoRefresh";
+
 export const dynamic = "force-dynamic";
 
 export default async function AdminVouchersPage() {
@@ -58,8 +60,16 @@ const vouchersWithStatus =
     }),
   );
 
-  return (
-    <div style={{ padding: 40, fontFamily: "sans-serif", backgroundColor: "#111827", minHeight: "100vh" }}>
+    return (
+  <div
+    style={{
+      padding: 40,
+      fontFamily: "sans-serif",
+      backgroundColor: "#111827",
+      minHeight: "100vh",
+    }}
+  >
+    <AutoRefresh />
       <h1 style={{ marginBottom: "20px", color: "#ffffff" }}>
         Reporte de Vouchers
       </h1>
@@ -97,7 +107,14 @@ const vouchersWithStatus =
                 </td>
                 {/* Corregido: Se aplicó padding y color consistente */}
                 <td style={{ padding: "12px 16px", color: "#ffffff" }}>
-                  {voucher.createdAt ? new Date(voucher.createdAt).toLocaleString() : "-"}
+                  {voucher.createdAt
+  ? new Date(voucher.createdAt).toLocaleString(
+      "es-PE",
+      {
+        timeZone: "America/Lima",
+      },
+    )
+  : "-"}
                 </td>
                 <td style={{ padding: "12px 16px", color: "#ffffff" }}>
                   {voucher.customerName}
@@ -117,7 +134,14 @@ const vouchersWithStatus =
                 </td>
                 {/* Corregido: Se aplicó padding y color consistente */}
                 <td style={{ padding: "12px 16px", color: "#ffffff" }}>
-                  {voucher.redeemedAt ? new Date(voucher.redeemedAt).toLocaleString() : "-"}
+                  {voucher.redeemedAt
+  ? new Date(voucher.redeemedAt).toLocaleString(
+      "es-PE",
+      {
+        timeZone: "America/Lima",
+      },
+    )
+  : "-"}
                 </td>
                 <td style={{ padding: "12px 16px" }}>
                   <span style={{
