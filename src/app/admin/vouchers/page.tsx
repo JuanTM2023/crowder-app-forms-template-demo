@@ -2,6 +2,7 @@ import { db } from "@/lib/db";
 import { foodVoucherLines } from "@/lib/db/schema";
 import { eq } from "drizzle-orm";
 import AutoRefresh from "./AutoRefresh";
+import ExportButton from "./ExportButton"; // Nuevo Componente Cliente para Exportar
 
 export const dynamic = "force-dynamic";
 
@@ -11,7 +12,8 @@ interface Props {
 
 export default async function AdminVouchersPage({ searchParams }: Props) {
   // 1. Extraer los parámetros de búsqueda de la URL
-  const { query, status, event } = await searchParams;
+  const resolvedParams = await searchParams;
+  const { query, status, event } = resolvedParams;
   const searchNormalized = query?.toLowerCase().trim() || "";
 
   // 2. Consultar los datos base de la base de datos
@@ -89,9 +91,13 @@ export default async function AdminVouchersPage({ searchParams }: Props) {
     >
       <AutoRefresh />
       
-      <h1 style={{ marginBottom: "20px", color: "#ffffff" }}>
-        Reporte de Vouchers
-      </h1>
+      <div style={{ display: "flex", justifyContent: "between", alignItems: "center", marginBottom: "20px", flexWrap: "wrap", gap: "16px" }}>
+        <h1 style={{ margin: 0, color: "#ffffff" }}>
+          Reporte de Vouchers
+        </h1>
+        {/* Inserción del botón de descarga pasándole los filtros actuales */}
+        <ExportButton searchParams={resolvedParams} />
+      </div>
 
       {/* Formulario nativo con método GET para aplicar filtros manipulando la URL */}
       <form
