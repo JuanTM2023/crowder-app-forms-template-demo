@@ -77,15 +77,10 @@ export default async function AdminVouchersPage({ searchParams }: Props) {
       }
 
       const raw = voucher as unknown as Record<string, unknown>;
-      let nombreDelShow = "-";
-
-      if (typeof raw.showName === "string") {
-        nombreDelShow = raw.showName;
-      } else if (raw.show && typeof raw.show === "object" && "name" in raw.show && typeof (raw.show as Record<string, unknown>).name === "string") {
-        nombreDelShow = (raw.show as Record<string, string>).name;
-      } else if (typeof raw.show_name === "string") {
-        nombreDelShow = raw.show_name;
-      }
+const nombreDelShow =
+  typeof raw.show === "string"
+    ? raw.show
+    : "-";
 
       return {
         id: voucher.id,
