@@ -186,6 +186,7 @@ export default async function AdminVouchersPage({ searchParams }: Props) {
               <th style={{ padding: "12px 16px", fontWeight: "600", color: "#9b9b9b" }}>Cliente</th>
               <th style={{ padding: "12px 16px", fontWeight: "600", color: "#9b9b9b" }}>Evento</th>
               <th style={{ padding: "12px 16px", fontWeight: "600", color: "#9b9b9b" }}>Sector</th>
+              <th style={{ padding: "12px 16px", fontWeight: "600", color: "#9b9b9b" }}>Sección (Mesa)</th>
               <th style={{ padding: "12px 16px", fontWeight: "600", color: "#9b9b9b" }}>Zona</th>
               <th style={{ padding: "12px 16px", fontWeight: "600", color: "#9b9b9b" }}>Canjeado Por</th>
               <th style={{ padding: "12px 16px", fontWeight: "600", color: "#9b9b9b" }}>Fecha Canje</th>
@@ -204,6 +205,7 @@ export default async function AdminVouchersPage({ searchParams }: Props) {
                 <td style={{ padding: "12px 16px", color: "#ffffff" }}>{voucher.customerName}</td>
                 <td style={{ padding: "12px 16px", color: "#ffffff" }}>{voucher.eventName}</td>
                 <td style={{ padding: "12px 16px", color: "#ffffff" }}>{voucher.sectorName}</td>
+                <td style={{ padding: "12px 16px", color: "#ffffff" }}>{voucher.sectionName ?? "-"}</td>
                 <td style={{ padding: "12px 16px", color: "#ffffff" }}>{voucher.sectionName}</td>
                 <td style={{ padding: "12px 16px", color: "#ffffff" }}>{voucher.redeemedBy ?? "-"}</td>
                 <td style={{ padding: "12px 16px", color: "#ffffff" }}>
@@ -230,7 +232,7 @@ export default async function AdminVouchersPage({ searchParams }: Props) {
             ))}
             {filteredVouchers.length === 0 && (
               <tr>
-                <td colSpan={11} style={{ padding: "24px", color: "#9ca3af", textAlign: "center" }}>
+                <td colSpan={12} style={{ padding: "24px", color: "#9ca3af", textAlign: "center" }}>
                   No se encontraron vouchers con los filtros aplicados.
                 </td>
               </tr>

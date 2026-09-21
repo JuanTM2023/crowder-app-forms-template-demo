@@ -8,14 +8,17 @@ export async function exportVouchersToExcel(searchParams: { query?: string; stat
   const searchNormalized = searchParams.query?.toLowerCase().trim() || "";
   const { status, event } = searchParams;
 
+  // 1. Obtener los datos base
   const vouchers = await db.query.foodVouchers.findMany();
 
+  // 2. Calcular los estados y compilar los productos en tiempo real
   const vouchersWithStatus = await Promise.all(
     vouchers.map(async (voucher) => {
       const lines = await db.query.foodVoucherLines.findMany({
         where: eq(foodVoucherLines.voucherId, voucher.id),
       });
 
+      // Compilar el resumen de productos: "Cantidad Nombre del Producto" separado por comas
       const resumenProductos = lines
         .map((line) => {
           const cantidad = line.quantityPurchased ?? 0;
@@ -45,6 +48,7 @@ export async function exportVouchersToExcel(searchParams: { query?: string; stat
     }),
   );
 
+  // 3. Aplicar los mismos filtros que en la vista web
   const filteredVouchers = vouchersWithStatus.filter((voucher) => {
     if (status && status !== "all" && voucher.calculatedStatus !== status) return false;
     if (event && event !== "all" && voucher.eventName !== event) return false;
@@ -65,31 +69,59 @@ export async function exportVouchersToExcel(searchParams: { query?: string; stat
     return "Pendiente";
   };
 
-  const headers = ["Voucher", "Orden ID", "Cliente", "Evento", "Sector", "Resumen", "Estado", "Entregado por", "Fecha entrega"];
-  
-  const rows = filteredVouchers.map((voucher) => {
+  // 4. Construir estructura de tabla HTML con meta tag UTF-8 para forzar a Excel a leer la Ñ y guiones
+  let html = `
+    <html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://w3.org">
+    <head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+      <!--[if gte mso 9]><xml><x:ExcelWorkbook><x:ExcelWorksheets><x:ExcelWorksheet><x:Name>Reporte de Vouchers</x:Name><x:WorksheetOptions><x:DisplayGridlines/></x:WorksheetOptions></x:ExcelWorksheet></x:ExcelWorksheets></x:ExcelWorkbook></xml><![endif]-->
+    </head>
+    <body>
+      <table border="1">
+        <thead>
+          <tr style="background-color: #1f2937; color: #ffffff; font-weight: bold;">
+            <th>Voucher</th>
+            <th>Orden ID</th>
+            <th>Cliente</th>
+            <th>Evento</th>
+            <th>Sector</th>
+            <th>Sección (Mesa)</th>
+            <th>Resumen</th>
+            <th>Estado</th>
+            <th>Entregado por</th>
+            <th>Fecha entrega</th>
+          </tr>
+        </thead>
+        <tbody>
+  `;
+
+  filteredVouchers.forEach((voucher) => {
     const fechaEntrega = voucher.redeemedAt
       ? new Date(voucher.redeemedAt).toLocaleString("es-PE", { timeZone: "America/Lima" })
       : "-";
 
-    return [
-      voucher.voucherNumber ?? "-",
-      voucher.transactionId ?? "-",
-      voucher.customerName ?? "-",
-      voucher.eventName ?? "-",
-      voucher.sectorName ?? "-",
-      voucher.resumenProductos,
-      getStatusText(voucher.calculatedStatus),
-      voucher.redeemedBy ?? "-",
-      fechaEntrega
-    ];
+    html += `
+      <tr>
+        <td>${voucher.voucherNumber ?? "-"}</td>
+        <td>${voucher.transactionId ?? "-"}</td>
+        <td>${voucher.customerName ?? "-"}</td>
+        <td>${voucher.eventName ?? "-"}</td>
+        <td>${voucher.sectorName ?? "-"}</td>
+        <td>${voucher.sectionName ?? "-"}</td>
+        <td>${voucher.resumenProductos}</td>
+        <td>${getStatusText(voucher.calculatedStatus)}</td>
+        <td>${voucher.redeemedBy ?? "-"}</td>
+        <td>${fechaEntrega}</td>
+      </tr>
+    `;
   });
 
-  const CSV_BOM = "\uFEFF";
-  const content = [
-    headers.join("\t"),
-    ...rows.map(row => row.map(val => `"${String(val).replace(/"/g, '""')}"`).join("\t"))
-  ].join("\n");
+  html += `
+        </tbody>
+      </table>
+    </body>
+    </html>
+  `;
 
-  return CSV_BOM + content;
+  return html;
 }

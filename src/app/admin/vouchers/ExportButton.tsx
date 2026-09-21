@@ -15,12 +15,13 @@ export default function ExportButton({ searchParams }: ExportButtonProps) {
       try {
         const fileContent = await exportVouchersToExcel(searchParams);
         
-        const blob = new Blob([fileContent], { type: "text/csv;charset=utf-8;" });
+        // El tipo de contenido cambia para forzar la lectura correcta de la estructura Excel
+        const blob = new Blob([fileContent], { type: "application/vnd.ms-excel;charset=utf-8;" });
         const url = URL.createObjectURL(blob);
         const link = document.createElement("a");
         
         link.href = url;
-        link.setAttribute("download", `Reporte_Vouchers_${new Date().toISOString().split('T')}.xls`);
+        link.setAttribute("download", `Reporte_Vouchers_${new Date().toISOString().split('T')[0]}.xls`);
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
