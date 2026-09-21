@@ -41,21 +41,23 @@ export default async function AdminVouchersPage({ searchParams }: Props) {
     )
   ).sort();
 
-  const uniqueShows = Array.from(
-    new Set(
-      vouchers
-        .map((v) => {
-          const raw = v as unknown as Record<string, unknown>;
-          if (typeof raw.showName === "string") return raw.showName;
-          if (raw.show && typeof raw.show === "object" && "name" in raw.show && typeof (raw.show as Record<string, unknown>).name === "string") {
-            return (raw.show as Record<string, string>).name;
-          }
-          if (typeof raw.show_name === "string") return raw.show_name;
-          return "";
-        })
-        .filter((name): name is string => typeof name === "string" && name.trim() !== "")
-    )
-  ).sort();
+const uniqueShows = Array.from(
+  new Set(
+    vouchers
+      .map((v) => {
+        const raw = v as unknown as Record<string, unknown>;
+
+        return typeof raw.show === "string"
+          ? raw.show
+          : "";
+      })
+      .filter(
+        (show): show is string =>
+          typeof show === "string" &&
+          show.trim() !== ""
+      )
+  )
+).sort();
 
   const vouchersWithStatus: WebExtendedVoucher[] = await Promise.all(
     vouchers.map(async (voucher) => {
