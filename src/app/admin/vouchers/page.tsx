@@ -2,22 +2,31 @@ import { db } from "@/lib/db";
 import { foodVoucherLines } from "@/lib/db/schema";
 import { eq } from "drizzle-orm";
 import AutoRefresh from "./AutoRefresh";
-//import Form from "next/form"; // Disponible en Next.js 15 para búsquedas nativas sin JS, o puedes usar un formulario estándar
 
 export const dynamic = "force-dynamic";
 
 interface Props {
-  searchParams: Promise<{ query?: string; status?: string }>;
+  searchParams: Promise<{ query?: string; status?: string; event?: string }>;
 }
 
 export default async function AdminVouchersPage({ searchParams }: Props) {
-  // 1. Desestructurar los parámetros de búsqueda de la URL
-  const { query, status } = await searchParams;
+  // 1. Extraer los parámetros de búsqueda de la URL
+  const { query, status, event } = await searchParams;
   const searchNormalized = query?.toLowerCase().trim() || "";
 
-  // 2. Obtener los datos base de la base de datos
+  // 2. Consultar los datos base de la base de datos
   const vouchers = await db.query.foodVouchers.findMany();
   
+  // 3. Extraer nombres de eventos únicos y válidos para llenar el Dropdown dinámicamente
+  const uniqueEvents = Array.from(
+    new Set(
+      vouchers
+        .map((v) => v.eventName)
+        .filter((name): name is string => typeof name === "string" && name.trim() !== "")
+    )
+  ).sort();
+
+  // 4. Calcular el estado de canje en tiempo real para cada voucher
   const vouchersWithStatus = await Promise.all(
     vouchers.map(async (voucher) => {
       const lines = await db.query.foodVoucherLines.findMany({
@@ -44,14 +53,19 @@ export default async function AdminVouchersPage({ searchParams }: Props) {
     }),
   );
 
-  // 3. Aplicar los filtros en memoria
+  // 5. Aplicar la lógica de filtrado del lado del servidor
   const filteredVouchers = vouchersWithStatus.filter((voucher) => {
     // Filtro por Estado
     if (status && status !== "all" && voucher.calculatedStatus !== status) {
       return false;
     }
 
-    // Filtro por Texto (Voucher, Cliente, Orden ID, Evento)
+    // Filtro por Evento específico seleccionado en el Dropdown
+    if (event && event !== "all" && voucher.eventName !== event) {
+      return false;
+    }
+
+    // Filtro global por Texto (Voucher, Cliente, Orden ID, Evento)
     if (searchNormalized) {
       const matchVoucher = voucher.voucherNumber?.toLowerCase().includes(searchNormalized);
       const matchCustomer = voucher.customerName?.toLowerCase().includes(searchNormalized);
@@ -79,7 +93,7 @@ export default async function AdminVouchersPage({ searchParams }: Props) {
         Reporte de Vouchers
       </h1>
 
-      {/* barra de filtros mediante un formulario GET nativo */}
+      {/* Formulario nativo con método GET para aplicar filtros manipulando la URL */}
       <form
         method="GET"
         style={{
@@ -90,6 +104,7 @@ export default async function AdminVouchersPage({ searchParams }: Props) {
           flexWrap: "wrap",
         }}
       >
+        {/* Input de búsqueda global */}
         <input
           type="text"
           name="query"
@@ -105,6 +120,28 @@ export default async function AdminVouchersPage({ searchParams }: Props) {
           }}
         />
 
+        {/* Dropdown dinámico para filtrar por Evento */}
+        <select
+          name="event"
+          defaultValue={event || "all"}
+          style={{
+            padding: "8px 12px",
+            borderRadius: "6px",
+            border: "1px solid #374151",
+            backgroundColor: "#1f2937",
+            color: "#ffffff",
+            maxWidth: "240px",
+          }}
+        >
+          <option value="all">Todos los eventos</option>
+          {uniqueEvents.map((eventName) => (
+            <option key={eventName} value={eventName}>
+              {eventName}
+            </option>
+          ))}
+        </select>
+
+        {/* Dropdown para filtrar por Estado */}
         <select
           name="status"
           defaultValue={status || "all"}
@@ -122,6 +159,7 @@ export default async function AdminVouchersPage({ searchParams }: Props) {
           <option value="redeemed">Canjeado</option>
         </select>
 
+        {/* Botón para accionar la búsqueda */}
         <button
           type="submit"
           style={{
@@ -137,7 +175,8 @@ export default async function AdminVouchersPage({ searchParams }: Props) {
           Filtrar
         </button>
 
-        {(query || (status && status !== "all")) && (
+        {/* Enlace dinámico para limpiar y restablecer todos los filtros */}
+        {(query || (status && status !== "all") || (event && event !== "all")) && (
           <a
             href="?"
             style={{
@@ -151,6 +190,7 @@ export default async function AdminVouchersPage({ searchParams }: Props) {
         )}
       </form>
 
+      {/* Tabla de Resultados */}
       <div style={{ overflowX: "auto" }}>
         <table
           style={{ width: "100%", borderCollapse: "collapse", textAlign: "left" }}
