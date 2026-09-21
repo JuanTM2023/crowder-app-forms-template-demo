@@ -10,24 +10,6 @@ interface Props {
   searchParams: Promise<{ query?: string; status?: string; event?: string; show?: string }>;
 }
 
-interface DrizzleVoucherRow {
-  id: string;
-  voucherNumber: string | null;
-  transactionId: string | null;
-  createdAt: Date | null;
-  customerName: string | null;
-  eventName: string | null;
-  sectorName: string | null;
-  sectionName: string | null;
-  redeemedBy: string | null;
-  redeemedAt: Date | null;
-  publicToken: string | null;
-  show?: {
-    name: string | null;
-  } | null;
-  showName?: string | null;
-}
-
 interface WebExtendedVoucher {
   id: string;
   voucherNumber: string | null;
@@ -49,12 +31,7 @@ export default async function AdminVouchersPage({ searchParams }: Props) {
   const { query, status, event, show } = resolvedParams;
   const searchNormalized = query?.toLowerCase().trim() || "";
 
-  // Forzamos el tipado correcto de la consulta relacional de Drizzle
-  const vouchers = await db.query.foodVouchers.findMany({
-    with: {
-      show: true
-    }
-  }) as unknown as DrizzleVoucherRow[];
+  const vouchers = await db.query.foodVouchers.findMany();
   
   const uniqueEvents = Array.from(
     new Set(
@@ -67,7 +44,15 @@ export default async function AdminVouchersPage({ searchParams }: Props) {
   const uniqueShows = Array.from(
     new Set(
       vouchers
-        .map((v) => v.show?.name ?? v.showName)
+        .map((v) => {
+          const raw = v as unknown as Record<string, unknown>;
+          if (typeof raw.showName === "string") return raw.showName;
+          if (raw.show && typeof raw.show === "object" && "name" in raw.show && typeof (raw.show as Record<string, unknown>).name === "string") {
+            return (raw.show as Record<string, string>).name;
+          }
+          if (typeof raw.show_name === "string") return raw.show_name;
+          return "";
+        })
         .filter((name): name is string => typeof name === "string" && name.trim() !== "")
     )
   ).sort();
@@ -91,7 +76,16 @@ export default async function AdminVouchersPage({ searchParams }: Props) {
         calculatedStatus = "partial";
       }
 
-      const nombreDelShow = voucher.show?.name ?? voucher.showName ?? "-";
+      const raw = voucher as unknown as Record<string, unknown>;
+      let nombreDelShow = "-";
+
+      if (typeof raw.showName === "string") {
+        nombreDelShow = raw.showName;
+      } else if (raw.show && typeof raw.show === "object" && "name" in raw.show && typeof (raw.show as Record<string, unknown>).name === "string") {
+        nombreDelShow = (raw.show as Record<string, string>).name;
+      } else if (typeof raw.show_name === "string") {
+        nombreDelShow = raw.show_name;
+      }
 
       return {
         id: voucher.id,
@@ -286,7 +280,7 @@ export default async function AdminVouchersPage({ searchParams }: Props) {
                 </td>
                 <td style={{ padding: "12px 16px", color: "#ffffff" }}>{voucher.customerName}</td>
                 <td style={{ padding: "12px 16px", color: "#ffffff" }}>{voucher.eventName}</td>
-                <td style={{ padding: "12px 16px", color: "#ffffff" }}>{voucher.showName ?? "-"}</td>
+                <td style={{ padding: "12px 16px", color: "#ffffff" }}>{voucher.showName}</td>
                 <td style={{ padding: "12px 16px", color: "#ffffff" }}>{voucher.sectorName}</td>
                 <td style={{ padding: "12px 16px", color: "#ffffff" }}>{voucher.sectionName ?? "-"}</td>
                 <td style={{ padding: "12px 16px", color: "#ffffff" }}>{voucher.redeemedBy ?? "-"}</td>

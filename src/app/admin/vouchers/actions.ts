@@ -4,24 +4,6 @@ import { db } from "@/lib/db";
 import { foodVoucherLines } from "@/lib/db/schema";
 import { eq } from "drizzle-orm";
 
-interface DrizzleVoucherRow {
-  id: string;
-  voucherNumber: string | null;
-  transactionId: string | null;
-  createdAt: Date | null;
-  customerName: string | null;
-  eventName: string | null;
-  sectorName: string | null;
-  sectionName: string | null;
-  redeemedBy: string | null;
-  redeemedAt: Date | null;
-  publicToken: string | null;
-  show?: {
-    name: string | null;
-  } | null;
-  showName?: string | null;
-}
-
 interface ExtendedVoucher {
   id: string;
   voucherNumber: string | null;
@@ -43,11 +25,7 @@ export async function exportVouchersToExcel(searchParams: { query?: string; stat
   const searchNormalized = searchParams.query?.toLowerCase().trim() || "";
   const { status, event, show } = searchParams;
 
-  const vouchers = await db.query.foodVouchers.findMany({
-    with: {
-      show: true
-    }
-  }) as unknown as DrizzleVoucherRow[];
+  const vouchers = await db.query.foodVouchers.findMany();
 
   const vouchersWithStatus: ExtendedVoucher[] = await Promise.all(
     vouchers.map(async (voucher) => {
@@ -76,9 +54,17 @@ export async function exportVouchersToExcel(searchParams: { query?: string; stat
         calculatedStatus = "partial";
       }
 
-      // Se corrige el acceso de forma segura usando la interfaz estricta definida arriba
-      const relacionShow = voucher.show;
-      const nombreDelShow = (relacionShow && relacionShow.name) ? relacionShow.name : (voucher.showName ?? "-");
+      // Validación segura y tipada en TypeScript para extraer dinámicamente propiedades alternativas sin 'any'
+      const raw = voucher as unknown as Record<string, unknown>;
+      let nombreDelShow = "-";
+
+      if (typeof raw.showName === "string") {
+        nombreDelShow = raw.showName;
+      } else if (raw.show && typeof raw.show === "object" && "name" in raw.show && typeof (raw.show as Record<string, unknown>).name === "string") {
+        nombreDelShow = (raw.show as Record<string, string>).name;
+      } else if (typeof raw.show_name === "string") {
+        nombreDelShow = raw.show_name;
+      }
 
       return {
         id: voucher.id,
@@ -125,7 +111,6 @@ export async function exportVouchersToExcel(searchParams: { query?: string; stat
     <html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://w3.org">
     <head>
       <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-      <!--[if gte mso 9]><xml><x:ExcelWorkbook><x:ExcelWorksheets><x:ExcelWorksheet><x:Name>Reporte de Vouchers</x:Name><x:WorksheetOptions><x:DisplayGridlines/></x:WorksheetOptions></x:ExcelWorksheet></x:ExcelWorksheets></x:ExcelWorkbook></xml><![endif]-->
     </head>
     <body>
       <table border="1">
