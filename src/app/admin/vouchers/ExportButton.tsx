@@ -4,7 +4,7 @@ import { useTransition } from "react";
 import { exportVouchersToExcel } from "./actions";
 
 interface ExportButtonProps {
-  searchParams: { query?: string; status?: string; event?: string };
+  searchParams: { query?: string; status?: string; event?: string; show?: string };
 }
 
 export default function ExportButton({ searchParams }: ExportButtonProps) {
@@ -15,13 +15,12 @@ export default function ExportButton({ searchParams }: ExportButtonProps) {
       try {
         const fileContent = await exportVouchersToExcel(searchParams);
         
-        // El tipo de contenido cambia para forzar la lectura correcta de la estructura Excel
         const blob = new Blob([fileContent], { type: "application/vnd.ms-excel;charset=utf-8;" });
         const url = URL.createObjectURL(blob);
         const link = document.createElement("a");
         
         link.href = url;
-        link.setAttribute("download", `Reporte_Vouchers_${new Date().toISOString().split('T')[0]}.xls`);
+        link.setAttribute("download", `Reporte_Vouchers_${new Date().toISOString().split('T')}.xls`);
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);

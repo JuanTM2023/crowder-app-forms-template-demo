@@ -4,21 +4,36 @@ import { db } from "@/lib/db";
 import { foodVoucherLines } from "@/lib/db/schema";
 import { eq } from "drizzle-orm";
 
-export async function exportVouchersToExcel(searchParams: { query?: string; status?: string; event?: string }) {
-  const searchNormalized = searchParams.query?.toLowerCase().trim() || "";
-  const { status, event } = searchParams;
+// Definimos un tipo seguro que extienda las propiedades esperadas
+interface ExtendedVoucher {
+  id: string;
+  voucherNumber: string | null;
+  transactionId: string | null;
+  createdAt: Date | null;
+  customerName: string | null;
+  eventName: string | null;
+  showName?: string | null; // Declarado explícitamente para evitar any
+  sectorName: string | null;
+  sectionName: string | null;
+  redeemedBy: string | null;
+  redeemedAt: Date | null;
+  publicToken: string | null;
+  calculatedStatus: string;
+  resumenProductos: string;
+}
 
-  // 1. Obtener los datos base
+export async function exportVouchersToExcel(searchParams: { query?: string; status?: string; event?: string; show?: string }) {
+  const searchNormalized = searchParams.query?.toLowerCase().trim() || "";
+  const { status, event, show } = searchParams;
+
   const vouchers = await db.query.foodVouchers.findMany();
 
-  // 2. Calcular los estados y compilar los productos en tiempo real
-  const vouchersWithStatus = await Promise.all(
+  const vouchersWithStatus: ExtendedVoucher[] = await Promise.all(
     vouchers.map(async (voucher) => {
       const lines = await db.query.foodVoucherLines.findMany({
         where: eq(foodVoucherLines.voucherId, voucher.id),
       });
 
-      // Compilar el resumen de productos: "Cantidad Nombre del Producto" separado por comas
       const resumenProductos = lines
         .map((line) => {
           const cantidad = line.quantityPurchased ?? 0;
@@ -40,25 +55,38 @@ export async function exportVouchersToExcel(searchParams: { query?: string; stat
         calculatedStatus = "partial";
       }
 
+      // Mapeamos el voucher asegurando que las propiedades existan con valores fallback
       return {
-        ...voucher,
+        id: voucher.id,
+        voucherNumber: voucher.voucherNumber ?? null,
+        transactionId: voucher.transactionId ?? null,
+        createdAt: voucher.createdAt ?? null,
+        customerName: voucher.customerName ?? null,
+        eventName: voucher.eventName ?? null,
+        showName: (voucher as { showName?: string | null }).showName ?? null, // Cast seguro y localizado
+        sectorName: voucher.sectorName ?? null,
+        sectionName: voucher.sectionName ?? null,
+        redeemedBy: voucher.redeemedBy ?? null,
+        redeemedAt: voucher.redeemedAt ?? null,
+        publicToken: voucher.publicToken ?? null,
         calculatedStatus,
         resumenProductos: resumenProductos || "-",
       };
     }),
   );
 
-  // 3. Aplicar los mismos filtros que en la vista web
   const filteredVouchers = vouchersWithStatus.filter((voucher) => {
     if (status && status !== "all" && voucher.calculatedStatus !== status) return false;
     if (event && event !== "all" && voucher.eventName !== event) return false;
+    if (show && show !== "all" && voucher.showName !== show) return false;
 
     if (searchNormalized) {
       const matchVoucher = voucher.voucherNumber?.toLowerCase().includes(searchNormalized);
       const matchCustomer = voucher.customerName?.toLowerCase().includes(searchNormalized);
       const matchTransaction = voucher.transactionId?.toLowerCase().includes(searchNormalized);
       const matchEvent = voucher.eventName?.toLowerCase().includes(searchNormalized);
-      return matchVoucher || matchCustomer || matchTransaction || matchEvent;
+      const matchShow = voucher.showName?.toLowerCase().includes(searchNormalized);
+      return matchVoucher || matchCustomer || matchTransaction || matchEvent || matchShow;
     }
     return true;
   });
@@ -69,7 +97,6 @@ export async function exportVouchersToExcel(searchParams: { query?: string; stat
     return "Pendiente";
   };
 
-  // 4. Construir estructura de tabla HTML con meta tag UTF-8 para forzar a Excel a leer la Ñ y guiones
   let html = `
     <html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://w3.org">
     <head>
@@ -84,8 +111,9 @@ export async function exportVouchersToExcel(searchParams: { query?: string; stat
             <th>Orden ID</th>
             <th>Cliente</th>
             <th>Evento</th>
+            <th>Show</th>
             <th>Sector</th>
-            <th>Sección (Mesa)</th>
+            <th>Sección</th>
             <th>Resumen</th>
             <th>Estado</th>
             <th>Entregado por</th>
@@ -106,6 +134,7 @@ export async function exportVouchersToExcel(searchParams: { query?: string; stat
         <td>${voucher.transactionId ?? "-"}</td>
         <td>${voucher.customerName ?? "-"}</td>
         <td>${voucher.eventName ?? "-"}</td>
+        <td>${voucher.showName ?? "-"}</td>
         <td>${voucher.sectorName ?? "-"}</td>
         <td>${voucher.sectionName ?? "-"}</td>
         <td>${voucher.resumenProductos}</td>

@@ -7,12 +7,28 @@ import ExportButton from "./ExportButton";
 export const dynamic = "force-dynamic";
 
 interface Props {
-  searchParams: Promise<{ query?: string; status?: string; event?: string }>;
+  searchParams: Promise<{ query?: string; status?: string; event?: string; show?: string }>;
+}
+
+interface WebExtendedVoucher {
+  id: string;
+  voucherNumber: string | null;
+  transactionId: string | null;
+  createdAt: Date | null;
+  customerName: string | null;
+  eventName: string | null;
+  showName: string | null;
+  sectorName: string | null;
+  sectionName: string | null;
+  redeemedBy: string | null;
+  redeemedAt: Date | null;
+  publicToken: string | null;
+  calculatedStatus: string;
 }
 
 export default async function AdminVouchersPage({ searchParams }: Props) {
   const resolvedParams = await searchParams;
-  const { query, status, event } = resolvedParams;
+  const { query, status, event, show } = resolvedParams;
   const searchNormalized = query?.toLowerCase().trim() || "";
 
   const vouchers = await db.query.foodVouchers.findMany();
@@ -25,7 +41,15 @@ export default async function AdminVouchersPage({ searchParams }: Props) {
     )
   ).sort();
 
-  const vouchersWithStatus = await Promise.all(
+  const uniqueShows = Array.from(
+    new Set(
+      vouchers
+        .map((v) => (v as { showName?: string | null }).showName)
+        .filter((name): name is string => typeof name === "string" && name.trim() !== "")
+    )
+  ).sort();
+
+  const vouchersWithStatus: WebExtendedVoucher[] = await Promise.all(
     vouchers.map(async (voucher) => {
       const lines = await db.query.foodVoucherLines.findMany({
         where: eq(foodVoucherLines.voucherId, voucher.id),
@@ -45,7 +69,18 @@ export default async function AdminVouchersPage({ searchParams }: Props) {
       }
 
       return {
-        ...voucher,
+        id: voucher.id,
+        voucherNumber: voucher.voucherNumber ?? null,
+        transactionId: voucher.transactionId ?? null,
+        createdAt: voucher.createdAt ?? null,
+        customerName: voucher.customerName ?? null,
+        eventName: voucher.eventName ?? null,
+        showName: (voucher as { showName?: string | null }).showName ?? null,
+        sectorName: voucher.sectorName ?? null,
+        sectionName: voucher.sectionName ?? null,
+        redeemedBy: voucher.redeemedBy ?? null,
+        redeemedAt: voucher.redeemedAt ?? null,
+        publicToken: voucher.publicToken ?? null,
         calculatedStatus,
       };
     }),
@@ -54,14 +89,16 @@ export default async function AdminVouchersPage({ searchParams }: Props) {
   const filteredVouchers = vouchersWithStatus.filter((voucher) => {
     if (status && status !== "all" && voucher.calculatedStatus !== status) return false;
     if (event && event !== "all" && voucher.eventName !== event) return false;
+    if (show && show !== "all" && voucher.showName !== show) return false;
 
     if (searchNormalized) {
       const matchVoucher = voucher.voucherNumber?.toLowerCase().includes(searchNormalized);
       const matchCustomer = voucher.customerName?.toLowerCase().includes(searchNormalized);
       const matchTransaction = voucher.transactionId?.toLowerCase().includes(searchNormalized);
       const matchEvent = voucher.eventName?.toLowerCase().includes(searchNormalized);
+      const matchShow = voucher.showName?.toLowerCase().includes(searchNormalized);
       
-      return matchVoucher || matchCustomer || matchTransaction || matchEvent;
+      return matchVoucher || matchCustomer || matchTransaction || matchEvent || matchShow;
     }
 
     return true;
@@ -131,6 +168,26 @@ export default async function AdminVouchersPage({ searchParams }: Props) {
         </select>
 
         <select
+          name="show"
+          defaultValue={show || "all"}
+          style={{
+            padding: "8px 12px",
+            borderRadius: "6px",
+            border: "1px solid #374151",
+            backgroundColor: "#1f2937",
+            color: "#ffffff",
+            maxWidth: "240px",
+          }}
+        >
+          <option value="all">Todos los shows</option>
+          {uniqueShows.map((showName) => (
+            <option key={showName} value={showName}>
+              {showName}
+            </option>
+          ))}
+        </select>
+
+        <select
           name="status"
           defaultValue={status || "all"}
           style={{
@@ -162,7 +219,7 @@ export default async function AdminVouchersPage({ searchParams }: Props) {
           Filtrar
         </button>
 
-        {(query || (status && status !== "all") || (event && event !== "all")) && (
+        {(query || (status && status !== "all") || (event && event !== "all") || (show && show !== "all")) && (
           <a
             href="?"
             style={{
@@ -185,9 +242,9 @@ export default async function AdminVouchersPage({ searchParams }: Props) {
               <th style={{ padding: "12px 16px", fontWeight: "600", color: "#9b9b9b" }}>Fecha Creación</th>
               <th style={{ padding: "12px 16px", fontWeight: "600", color: "#9b9b9b" }}>Cliente</th>
               <th style={{ padding: "12px 16px", fontWeight: "600", color: "#9b9b9b" }}>Evento</th>
+              <th style={{ padding: "12px 16px", fontWeight: "600", color: "#9b9b9b" }}>Show</th>
               <th style={{ padding: "12px 16px", fontWeight: "600", color: "#9b9b9b" }}>Sector</th>
-              <th style={{ padding: "12px 16px", fontWeight: "600", color: "#9b9b9b" }}>Sección (Mesa)</th>
-              <th style={{ padding: "12px 16px", fontWeight: "600", color: "#9b9b9b" }}>Zona</th>
+              <th style={{ padding: "12px 16px", fontWeight: "600", color: "#9b9b9b" }}>Sección</th>
               <th style={{ padding: "12px 16px", fontWeight: "600", color: "#9b9b9b" }}>Canjeado Por</th>
               <th style={{ padding: "12px 16px", fontWeight: "600", color: "#9b9b9b" }}>Fecha Canje</th>
               <th style={{ padding: "12px 16px", fontWeight: "600", color: "#9b9b9b" }}>Estado</th>
@@ -204,9 +261,9 @@ export default async function AdminVouchersPage({ searchParams }: Props) {
                 </td>
                 <td style={{ padding: "12px 16px", color: "#ffffff" }}>{voucher.customerName}</td>
                 <td style={{ padding: "12px 16px", color: "#ffffff" }}>{voucher.eventName}</td>
+                <td style={{ padding: "12px 16px", color: "#ffffff" }}>{voucher.showName ?? "-"}</td>
                 <td style={{ padding: "12px 16px", color: "#ffffff" }}>{voucher.sectorName}</td>
                 <td style={{ padding: "12px 16px", color: "#ffffff" }}>{voucher.sectionName ?? "-"}</td>
-                <td style={{ padding: "12px 16px", color: "#ffffff" }}>{voucher.sectionName}</td>
                 <td style={{ padding: "12px 16px", color: "#ffffff" }}>{voucher.redeemedBy ?? "-"}</td>
                 <td style={{ padding: "12px 16px", color: "#ffffff" }}>
                   {voucher.redeemedAt ? new Date(voucher.redeemedAt).toLocaleString("es-PE", { timeZone: "America/Lima" }) : "-"}
