@@ -4,7 +4,24 @@ import { db } from "@/lib/db";
 import { foodVoucherLines } from "@/lib/db/schema";
 import { eq } from "drizzle-orm";
 
-// Definimos un tipo seguro que extienda las propiedades esperadas
+interface DrizzleVoucherRow {
+  id: string;
+  voucherNumber: string | null;
+  transactionId: string | null;
+  createdAt: Date | null;
+  customerName: string | null;
+  eventName: string | null;
+  sectorName: string | null;
+  sectionName: string | null;
+  redeemedBy: string | null;
+  redeemedAt: Date | null;
+  publicToken: string | null;
+  show?: {
+    name: string | null;
+  } | null;
+  showName?: string | null;
+}
+
 interface ExtendedVoucher {
   id: string;
   voucherNumber: string | null;
@@ -12,7 +29,7 @@ interface ExtendedVoucher {
   createdAt: Date | null;
   customerName: string | null;
   eventName: string | null;
-  showName?: string | null; // Declarado explícitamente para evitar any
+  showName: string | null;
   sectorName: string | null;
   sectionName: string | null;
   redeemedBy: string | null;
@@ -26,7 +43,11 @@ export async function exportVouchersToExcel(searchParams: { query?: string; stat
   const searchNormalized = searchParams.query?.toLowerCase().trim() || "";
   const { status, event, show } = searchParams;
 
-  const vouchers = await db.query.foodVouchers.findMany();
+  const vouchers = await db.query.foodVouchers.findMany({
+    with: {
+      show: true
+    }
+  }) as unknown as DrizzleVoucherRow[];
 
   const vouchersWithStatus: ExtendedVoucher[] = await Promise.all(
     vouchers.map(async (voucher) => {
@@ -55,7 +76,10 @@ export async function exportVouchersToExcel(searchParams: { query?: string; stat
         calculatedStatus = "partial";
       }
 
-      // Mapeamos el voucher asegurando que las propiedades existan con valores fallback
+      // Se corrige el acceso de forma segura usando la interfaz estricta definida arriba
+      const relacionShow = voucher.show;
+      const nombreDelShow = (relacionShow && relacionShow.name) ? relacionShow.name : (voucher.showName ?? "-");
+
       return {
         id: voucher.id,
         voucherNumber: voucher.voucherNumber ?? null,
@@ -63,7 +87,7 @@ export async function exportVouchersToExcel(searchParams: { query?: string; stat
         createdAt: voucher.createdAt ?? null,
         customerName: voucher.customerName ?? null,
         eventName: voucher.eventName ?? null,
-        showName: (voucher as { showName?: string | null }).showName ?? null, // Cast seguro y localizado
+        showName: nombreDelShow,
         sectorName: voucher.sectorName ?? null,
         sectionName: voucher.sectionName ?? null,
         redeemedBy: voucher.redeemedBy ?? null,
@@ -134,7 +158,7 @@ export async function exportVouchersToExcel(searchParams: { query?: string; stat
         <td>${voucher.transactionId ?? "-"}</td>
         <td>${voucher.customerName ?? "-"}</td>
         <td>${voucher.eventName ?? "-"}</td>
-        <td>${voucher.showName ?? "-"}</td>
+        <td>${voucher.showName}</td>
         <td>${voucher.sectorName ?? "-"}</td>
         <td>${voucher.sectionName ?? "-"}</td>
         <td>${voucher.resumenProductos}</td>

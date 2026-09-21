@@ -10,6 +10,24 @@ interface Props {
   searchParams: Promise<{ query?: string; status?: string; event?: string; show?: string }>;
 }
 
+interface DrizzleVoucherRow {
+  id: string;
+  voucherNumber: string | null;
+  transactionId: string | null;
+  createdAt: Date | null;
+  customerName: string | null;
+  eventName: string | null;
+  sectorName: string | null;
+  sectionName: string | null;
+  redeemedBy: string | null;
+  redeemedAt: Date | null;
+  publicToken: string | null;
+  show?: {
+    name: string | null;
+  } | null;
+  showName?: string | null;
+}
+
 interface WebExtendedVoucher {
   id: string;
   voucherNumber: string | null;
@@ -31,7 +49,12 @@ export default async function AdminVouchersPage({ searchParams }: Props) {
   const { query, status, event, show } = resolvedParams;
   const searchNormalized = query?.toLowerCase().trim() || "";
 
-  const vouchers = await db.query.foodVouchers.findMany();
+  // Forzamos el tipado correcto de la consulta relacional de Drizzle
+  const vouchers = await db.query.foodVouchers.findMany({
+    with: {
+      show: true
+    }
+  }) as unknown as DrizzleVoucherRow[];
   
   const uniqueEvents = Array.from(
     new Set(
@@ -44,7 +67,7 @@ export default async function AdminVouchersPage({ searchParams }: Props) {
   const uniqueShows = Array.from(
     new Set(
       vouchers
-        .map((v) => (v as { showName?: string | null }).showName)
+        .map((v) => v.show?.name ?? v.showName)
         .filter((name): name is string => typeof name === "string" && name.trim() !== "")
     )
   ).sort();
@@ -68,6 +91,8 @@ export default async function AdminVouchersPage({ searchParams }: Props) {
         calculatedStatus = "partial";
       }
 
+      const nombreDelShow = voucher.show?.name ?? voucher.showName ?? "-";
+
       return {
         id: voucher.id,
         voucherNumber: voucher.voucherNumber ?? null,
@@ -75,7 +100,7 @@ export default async function AdminVouchersPage({ searchParams }: Props) {
         createdAt: voucher.createdAt ?? null,
         customerName: voucher.customerName ?? null,
         eventName: voucher.eventName ?? null,
-        showName: (voucher as { showName?: string | null }).showName ?? null,
+        showName: nombreDelShow,
         sectorName: voucher.sectorName ?? null,
         sectionName: voucher.sectionName ?? null,
         redeemedBy: voucher.redeemedBy ?? null,
