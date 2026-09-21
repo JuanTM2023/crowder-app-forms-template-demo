@@ -44,13 +44,13 @@ export default async function AdminVouchersPage({ searchParams }: Props) {
 const uniqueShows = Array.from(
   new Set(
     vouchers
-      .map((v) => {
-        const raw = v as unknown as Record<string, unknown>;
-
-        return typeof raw.show === "string"
-          ? raw.show
-          : "";
-      })
+      .filter(
+        (v) =>
+          !event ||
+          event === "all" ||
+          v.eventName === event
+      )
+      .map((v) => v.show)
       .filter(
         (show): show is string =>
           typeof show === "string" &&
