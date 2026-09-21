@@ -2,7 +2,7 @@ import { db } from "@/lib/db";
 import { foodVoucherLines } from "@/lib/db/schema";
 import { eq } from "drizzle-orm";
 import AutoRefresh from "./AutoRefresh";
-import ExportButton from "./ExportButton"; // Nuevo Componente Cliente para Exportar
+import ExportButton from "./ExportButton";
 
 export const dynamic = "force-dynamic";
 
@@ -11,15 +11,12 @@ interface Props {
 }
 
 export default async function AdminVouchersPage({ searchParams }: Props) {
-  // 1. Extraer los parámetros de búsqueda de la URL
   const resolvedParams = await searchParams;
   const { query, status, event } = resolvedParams;
   const searchNormalized = query?.toLowerCase().trim() || "";
 
-  // 2. Consultar los datos base de la base de datos
   const vouchers = await db.query.foodVouchers.findMany();
   
-  // 3. Extraer nombres de eventos únicos y válidos para llenar el Dropdown dinámicamente
   const uniqueEvents = Array.from(
     new Set(
       vouchers
@@ -28,7 +25,6 @@ export default async function AdminVouchersPage({ searchParams }: Props) {
     )
   ).sort();
 
-  // 4. Calcular el estado de canje en tiempo real para cada voucher
   const vouchersWithStatus = await Promise.all(
     vouchers.map(async (voucher) => {
       const lines = await db.query.foodVoucherLines.findMany({
@@ -55,19 +51,10 @@ export default async function AdminVouchersPage({ searchParams }: Props) {
     }),
   );
 
-  // 5. Aplicar la lógica de filtrado del lado del servidor
   const filteredVouchers = vouchersWithStatus.filter((voucher) => {
-    // Filtro por Estado
-    if (status && status !== "all" && voucher.calculatedStatus !== status) {
-      return false;
-    }
+    if (status && status !== "all" && voucher.calculatedStatus !== status) return false;
+    if (event && event !== "all" && voucher.eventName !== event) return false;
 
-    // Filtro por Evento específico seleccionado en el Dropdown
-    if (event && event !== "all" && voucher.eventName !== event) {
-      return false;
-    }
-
-    // Filtro global por Texto (Voucher, Cliente, Orden ID, Evento)
     if (searchNormalized) {
       const matchVoucher = voucher.voucherNumber?.toLowerCase().includes(searchNormalized);
       const matchCustomer = voucher.customerName?.toLowerCase().includes(searchNormalized);
@@ -91,15 +78,13 @@ export default async function AdminVouchersPage({ searchParams }: Props) {
     >
       <AutoRefresh />
       
-      <div style={{ display: "flex", justifyContent: "between", alignItems: "center", marginBottom: "20px", flexWrap: "wrap", gap: "16px" }}>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "20px", flexWrap: "wrap", gap: "16px" }}>
         <h1 style={{ margin: 0, color: "#ffffff" }}>
           Reporte de Vouchers
         </h1>
-        {/* Inserción del botón de descarga pasándole los filtros actuales */}
         <ExportButton searchParams={resolvedParams} />
       </div>
 
-      {/* Formulario nativo con método GET para aplicar filtros manipulando la URL */}
       <form
         method="GET"
         style={{
@@ -110,7 +95,6 @@ export default async function AdminVouchersPage({ searchParams }: Props) {
           flexWrap: "wrap",
         }}
       >
-        {/* Input de búsqueda global */}
         <input
           type="text"
           name="query"
@@ -126,7 +110,6 @@ export default async function AdminVouchersPage({ searchParams }: Props) {
           }}
         />
 
-        {/* Dropdown dinámico para filtrar por Evento */}
         <select
           name="event"
           defaultValue={event || "all"}
@@ -147,7 +130,6 @@ export default async function AdminVouchersPage({ searchParams }: Props) {
           ))}
         </select>
 
-        {/* Dropdown para filtrar por Estado */}
         <select
           name="status"
           defaultValue={status || "all"}
@@ -165,7 +147,6 @@ export default async function AdminVouchersPage({ searchParams }: Props) {
           <option value="redeemed">Canjeado</option>
         </select>
 
-        {/* Botón para accionar la búsqueda */}
         <button
           type="submit"
           style={{
@@ -181,7 +162,6 @@ export default async function AdminVouchersPage({ searchParams }: Props) {
           Filtrar
         </button>
 
-        {/* Enlace dinámico para limpiar y restablecer todos los filtros */}
         {(query || (status && status !== "all") || (event && event !== "all")) && (
           <a
             href="?"
@@ -196,11 +176,8 @@ export default async function AdminVouchersPage({ searchParams }: Props) {
         )}
       </form>
 
-      {/* Tabla de Resultados */}
       <div style={{ overflowX: "auto" }}>
-        <table
-          style={{ width: "100%", borderCollapse: "collapse", textAlign: "left" }}
-        >
+        <table style={{ width: "100%", borderCollapse: "collapse", textAlign: "left" }}>
           <thead>
             <tr style={{ backgroundColor: "#1f2937", borderBottom: "2px solid #374151" }}>
               <th style={{ padding: "12px 16px", fontWeight: "600", color: "#9b9b9b" }}>Voucher</th>
@@ -219,40 +196,18 @@ export default async function AdminVouchersPage({ searchParams }: Props) {
           <tbody>
             {filteredVouchers.map((voucher) => (
               <tr key={voucher.id} style={{ borderBottom: "1px solid #374151" }}>
-                <td style={{ padding: "12px 16px", color: "#fdfdfd", fontWeight: "500" }}>
-                  {voucher.voucherNumber}
-                </td>
+                <td style={{ padding: "12px 16px", color: "#fdfdfd", fontWeight: "500" }}>{voucher.voucherNumber}</td>
+                <td style={{ padding: "12px 16px", color: "#ffffff" }}>{voucher.transactionId}</td>
                 <td style={{ padding: "12px 16px", color: "#ffffff" }}>
-                  {voucher.transactionId}
+                  {voucher.createdAt ? new Date(voucher.createdAt).toLocaleString("es-PE", { timeZone: "America/Lima" }) : "-"}
                 </td>
+                <td style={{ padding: "12px 16px", color: "#ffffff" }}>{voucher.customerName}</td>
+                <td style={{ padding: "12px 16px", color: "#ffffff" }}>{voucher.eventName}</td>
+                <td style={{ padding: "12px 16px", color: "#ffffff" }}>{voucher.sectorName}</td>
+                <td style={{ padding: "12px 16px", color: "#ffffff" }}>{voucher.sectionName}</td>
+                <td style={{ padding: "12px 16px", color: "#ffffff" }}>{voucher.redeemedBy ?? "-"}</td>
                 <td style={{ padding: "12px 16px", color: "#ffffff" }}>
-                  {voucher.createdAt
-                    ? new Date(voucher.createdAt).toLocaleString("es-PE", {
-                        timeZone: "America/Lima",
-                      })
-                    : "-"}
-                </td>
-                <td style={{ padding: "12px 16px", color: "#ffffff" }}>
-                  {voucher.customerName}
-                </td>
-                <td style={{ padding: "12px 16px", color: "#ffffff" }}>
-                  {voucher.eventName}
-                </td>
-                <td style={{ padding: "12px 16px", color: "#ffffff" }}>
-                  {voucher.sectorName}
-                </td>
-                <td style={{ padding: "12px 16px", color: "#ffffff" }}>
-                  {voucher.sectionName}
-                </td>
-                <td style={{ padding: "12px 16px", color: "#ffffff" }}>
-                  {voucher.redeemedBy ?? "-"}
-                </td>
-                <td style={{ padding: "12px 16px", color: "#ffffff" }}>
-                  {voucher.redeemedAt
-                    ? new Date(voucher.redeemedAt).toLocaleString("es-PE", {
-                        timeZone: "America/Lima",
-                      })
-                    : "-"}
+                  {voucher.redeemedAt ? new Date(voucher.redeemedAt).toLocaleString("es-PE", { timeZone: "America/Lima" }) : "-"}
                 </td>
                 <td style={{ padding: "12px 16px" }}>
                   <span
@@ -261,38 +216,15 @@ export default async function AdminVouchersPage({ searchParams }: Props) {
                       borderRadius: "4px",
                       fontSize: "14px",
                       fontWeight: "500",
-                      backgroundColor:
-                        voucher.calculatedStatus === "redeemed"
-                          ? "#def7ec"
-                          : voucher.calculatedStatus === "partial"
-                          ? "#dbeafe"
-                          : "#fef3c7",
-                      color:
-                        voucher.calculatedStatus === "redeemed"
-                          ? "#03543f"
-                          : voucher.calculatedStatus === "partial"
-                          ? "#1e40af"
-                          : "#78350f",
+                      backgroundColor: voucher.calculatedStatus === "redeemed" ? "#def7ec" : voucher.calculatedStatus === "partial" ? "#dbeafe" : "#fef3c7",
+                      color: voucher.calculatedStatus === "redeemed" ? "#03543f" : voucher.calculatedStatus === "partial" ? "#1e40af" : "#78350f",
                     }}
                   >
-                    {voucher.calculatedStatus === "redeemed"
-                      ? "Canjeado"
-                      : voucher.calculatedStatus === "partial"
-                      ? "Parcial"
-                      : "Pendiente"}
+                    {voucher.calculatedStatus === "redeemed" ? "Canjeado" : voucher.calculatedStatus === "partial" ? "Parcial" : "Pendiente"}
                   </span>
                 </td>
                 <td style={{ padding: "12px 16px" }}>
-                  <a
-                    href={`/redeem/${voucher.publicToken}`}
-                    style={{
-                      color: "#3b82f6",
-                      textDecoration: "none",
-                      fontWeight: "600",
-                    }}
-                  >
-                    Ver
-                  </a>
+                  <a href={`/redeem/${voucher.publicToken}`} style={{ color: "#3b82f6", textDecoration: "none", fontWeight: "600" }}>Ver</a>
                 </td>
               </tr>
             ))}

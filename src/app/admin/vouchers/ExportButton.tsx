@@ -15,13 +15,12 @@ export default function ExportButton({ searchParams }: ExportButtonProps) {
       try {
         const fileContent = await exportVouchersToExcel(searchParams);
         
-        // Crear el archivo en memoria y forzar la descarga en el navegador
         const blob = new Blob([fileContent], { type: "text/csv;charset=utf-8;" });
         const url = URL.createObjectURL(blob);
         const link = document.createElement("a");
         
         link.href = url;
-        link.setAttribute("download", `Reporte_Vouchers_${new Date().toISOString().split('T')[0]}.xls`);
+        link.setAttribute("download", `Reporte_Vouchers_${new Date().toISOString().split('T')}.xls`);
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
@@ -40,7 +39,7 @@ export default function ExportButton({ searchParams }: ExportButtonProps) {
       style={{
         padding: "8px 16px",
         borderRadius: "6px",
-        backgroundColor: "#10b981", // Color verde esmeralda para Excel
+        backgroundColor: "#10b981",
         color: "#ffffff",
         border: "none",
         fontWeight: "600",

@@ -8,15 +8,21 @@ export async function exportVouchersToExcel(searchParams: { query?: string; stat
   const searchNormalized = searchParams.query?.toLowerCase().trim() || "";
   const { status, event } = searchParams;
 
-  // 1. Obtener los datos base
   const vouchers = await db.query.foodVouchers.findMany();
 
-  // 2. Calcular los estados en tiempo real
   const vouchersWithStatus = await Promise.all(
     vouchers.map(async (voucher) => {
       const lines = await db.query.foodVoucherLines.findMany({
         where: eq(foodVoucherLines.voucherId, voucher.id),
       });
+
+      const resumenProductos = lines
+        .map((line) => {
+          const cantidad = line.quantityPurchased ?? 0;
+          const nombreProducto = line.productName ?? "Producto"; 
+          return `${cantidad} ${nombreProducto}`;
+        })
+        .join(", ");
 
       const allRedeemed =
         lines.length > 0 &&
@@ -34,11 +40,11 @@ export async function exportVouchersToExcel(searchParams: { query?: string; stat
       return {
         ...voucher,
         calculatedStatus,
+        resumenProductos: resumenProductos || "-",
       };
     }),
   );
 
-  // 3. Aplicar los mismos filtros que en la vista web
   const filteredVouchers = vouchersWithStatus.filter((voucher) => {
     if (status && status !== "all" && voucher.calculatedStatus !== status) return false;
     if (event && event !== "all" && voucher.eventName !== event) return false;
@@ -53,15 +59,13 @@ export async function exportVouchersToExcel(searchParams: { query?: string; stat
     return true;
   });
 
-  // 4. Mapear los nombres de los estados
   const getStatusText = (status: string) => {
     if (status === "redeemed") return "Canjeado";
     if (status === "partial") return "Parcial";
     return "Pendiente";
   };
 
-  // 5. Construir un archivo CSV/TSV compatible nativamente con Excel usando delimitador de tabulación y BOM UTF-8
-  const headers = ["Voucher", "Orden ID", "Cliente", "Evento", "Sector", "Estado", "Entregado por", "Fecha entrega"];
+  const headers = ["Voucher", "Orden ID", "Cliente", "Evento", "Sector", "Resumen", "Estado", "Entregado por", "Fecha entrega"];
   
   const rows = filteredVouchers.map((voucher) => {
     const fechaEntrega = voucher.redeemedAt
@@ -74,13 +78,13 @@ export async function exportVouchersToExcel(searchParams: { query?: string; stat
       voucher.customerName ?? "-",
       voucher.eventName ?? "-",
       voucher.sectorName ?? "-",
+      voucher.resumenProductos,
       getStatusText(voucher.calculatedStatus),
       voucher.redeemedBy ?? "-",
       fechaEntrega
     ];
   });
 
-  // Formato TSV (Tab-Separated Values) con codificación especial para Excel
   const CSV_BOM = "\uFEFF";
   const content = [
     headers.join("\t"),
