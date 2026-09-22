@@ -53,7 +53,7 @@ const uniqueShows = Array.from(
       .map((v) => v.showName)
       .filter(
         (show): show is string =>
-          typeof show === "string" &&
+          !!show &&
           show.trim() !== ""
       )
   )
@@ -78,11 +78,10 @@ const uniqueShows = Array.from(
         calculatedStatus = "partial";
       }
 
-      const raw = voucher as unknown as Record<string, unknown>;
+
+
 const nombreDelShow =
-  typeof raw.show === "string"
-    ? raw.show
-    : "-";
+  voucher.showName ?? "-";
 
       return {
         id: voucher.id,
