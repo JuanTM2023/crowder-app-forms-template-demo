@@ -44,7 +44,7 @@ const partiallyRedeemed = lines.some(
       <p><strong>Voucher:</strong> {voucher.voucherNumber}</p>
       <p><strong>Cliente:</strong> {voucher.customerName}</p>
       <p><strong>Evento:</strong> {voucher.eventName}</p>
-      <p><strong>Fecha:</strong> {voucher.show}</p>
+      <p><strong>Fecha:</strong> {voucher.showName}</p>
       <p><strong>Sector:</strong> {voucher.sectorName}</p>
 
       {qrCode && (

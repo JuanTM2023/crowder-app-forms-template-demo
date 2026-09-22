@@ -50,7 +50,7 @@ const uniqueShows = Array.from(
           event === "all" ||
           v.eventName === event
       )
-      .map((v) => v.show)
+      .map((v) => v.showName)
       .filter(
         (show): show is string =>
           typeof show === "string" &&

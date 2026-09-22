@@ -1,5 +1,5 @@
 {
-  "id": "77960a66-0687-40ba-96cb-bed61121a8a0",
+  "id": "394e5981-9fe0-4a6b-b73d-7b081ff21d20",
   "prevId": "a713d0b3-551a-4fa6-9727-cbd22c270494",
   "version": "7",
   "dialect": "postgresql",
@@ -474,8 +474,8 @@
           "primaryKey": false,
           "notNull": true
         },
-        "show": {
-          "name": "show",
+        "show_name": {
+          "name": "show_name",
           "type": "text",
           "primaryKey": false,
           "notNull": false
@@ -1683,6 +1683,12 @@
           "primaryKey": false,
           "notNull": true
         },
+        "show_id": {
+          "name": "show_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
         "locale": {
           "name": "locale",
           "type": "text",
@@ -1691,6 +1697,12 @@
         },
         "user_snapshot": {
           "name": "user_snapshot",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "items_snapshot": {
+          "name": "items_snapshot",
           "type": "jsonb",
           "primaryKey": false,
           "notNull": false

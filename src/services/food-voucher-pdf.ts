@@ -6,7 +6,7 @@ export async function generateVoucherPdf(
     voucherNumber: string;
     customerName: string | null;
     eventName: string;
-    show: string | null;
+    showName: string | null;
     sectorName: string | null;
     qrUrl: string | null;
   },
@@ -56,7 +56,7 @@ export async function generateVoucherPdf(
   y -= 20;
 
   page.drawText(
-    `Fecha: ${voucher.show ?? ""}`,
+    `Fecha: ${voucher.showName ?? ""}`,
     { x: 50, y, size: 12, font }
   );
 

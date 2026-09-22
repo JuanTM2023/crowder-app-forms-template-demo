@@ -477,6 +477,7 @@ export const transactions = pgTable(
     currency: text("currency").notNull(),
     eventId: integer("event_id").notNull(),
     eventName: text("event_name").notNull(),
+    showId: text("show_id"),
     // Crowder context fields kept for export/audit; nullable for rows created
     // before this column existed and for contexts that omit them.
     locale: text("locale"),
@@ -718,7 +719,7 @@ export const foodVouchers = pgTable("food_vouchers", {
 
   eventName: text("event_name").notNull(),
 
-  show: text("show"),
+showName: text("show_name"),
 
   sectorName: text("sector_name"),
 

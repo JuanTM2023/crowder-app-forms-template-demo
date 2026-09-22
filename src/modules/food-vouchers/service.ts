@@ -111,7 +111,7 @@ console.log("APP URL =", process.env.APP_URL);
 
       eventName: context.eventName,
 
-      show: showDisplay,
+      showName: showDisplay,
 
       sectorName: firstItem?.sectorName ?? null,
 
