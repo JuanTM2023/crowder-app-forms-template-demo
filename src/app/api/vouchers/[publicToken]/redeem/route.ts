@@ -34,13 +34,16 @@ export async function POST(
   }
 
   // 5. Actualizar el estado del voucher a 'redeemed'
-  await db
-    .update(foodVouchers)
-    .set({
-      status: "redeemed",
-      redeemedAt: new Date(),
-      redeemedBy: "LOCAL",
-    })
+const redeemedBy = "LOCAL";
+
+await db
+  .update(foodVouchers)
+  .set({
+    status: "redeemed",
+    redeemedAt: new Date(),
+    redeemedBy,
+  })
+  
     .where(eq(foodVouchers.id, voucher.id));
 
   // 6. Redirigir a la página del voucher tras el canje exitoso

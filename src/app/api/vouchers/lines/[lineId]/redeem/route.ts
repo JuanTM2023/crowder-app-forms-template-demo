@@ -50,7 +50,9 @@ export async function POST(
         lineId,
       ),
     );
-    
+
+  const redeemedBy =
+  "juan.tenorio@ticketmaster.pe";
 
   await db
     .insert(
@@ -60,14 +62,15 @@ export async function POST(
       voucherId: line.voucherId,
       voucherLineId: line.id,
       quantity: 1,
-      redeemedBy: "LOCAL",
+      redeemedBy,
     });
 
-    await db
+await db
   .update(foodVouchers)
   .set({
+    status: "redeemed",
     redeemedAt: new Date(),
-    redeemedBy: "LOCAL",
+    redeemedBy,
   })
   .where(
     eq(
