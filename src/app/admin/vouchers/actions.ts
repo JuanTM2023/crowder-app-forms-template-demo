@@ -1,13 +1,17 @@
 "use server";
 
 import { db } from "@/lib/db";
-import { foodVoucherLines } from "@/lib/db/schema";
+import { foodVoucherLines, 
+  transactions,
+} from "@/lib/db/schema";
 import { eq } from "drizzle-orm";
+
 
 interface ExtendedVoucher {
   id: string;
   voucherNumber: string | null;
   transactionId: string | null;
+  purchaseId: number | null;
   createdAt: Date | null;
   customerName: string | null;
   eventName: string | null;
@@ -66,10 +70,21 @@ export async function exportVouchersToExcel(searchParams: { query?: string; stat
         nombreDelShow = raw.show_name;
       }
 
+      const transaction =
+  voucher.transactionId
+    ? await db.query.transactions.findFirst({
+        where: eq(
+          transactions.id,
+          voucher.transactionId,
+        ),
+      })
+    : null;
+
       return {
         id: voucher.id,
         voucherNumber: voucher.voucherNumber ?? null,
         transactionId: voucher.transactionId ?? null,
+        purchaseId: transaction?.purchaseId ?? null,
         createdAt: voucher.createdAt ?? null,
         customerName: voucher.customerName ?? null,
         eventName: voucher.eventName ?? null,
@@ -140,7 +155,7 @@ export async function exportVouchersToExcel(searchParams: { query?: string; stat
     html += `
       <tr>
         <td>${voucher.voucherNumber ?? "-"}</td>
-        <td>${voucher.transactionId ?? "-"}</td>
+        <td>${voucher.purchaseId ?? "-"}</td>
         <td>${voucher.customerName ?? "-"}</td>
         <td>${voucher.eventName ?? "-"}</td>
         <td>${voucher.showName}</td>

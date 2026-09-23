@@ -1,5 +1,8 @@
 import { db } from "@/lib/db";
-import { foodVoucherLines } from "@/lib/db/schema";
+import {
+foodVoucherLines,
+  transactions,
+} from "@/lib/db/schema";
 import { eq } from "drizzle-orm";
 import AutoRefresh from "./AutoRefresh";
 import ExportButton from "./ExportButton";
@@ -14,6 +17,7 @@ interface WebExtendedVoucher {
   id: string;
   voucherNumber: string | null;
   transactionId: string | null;
+  purchaseId: number | null;
   createdAt: Date | null;
   customerName: string | null;
   eventName: string | null;
@@ -65,6 +69,16 @@ const uniqueShows = Array.from(
         where: eq(foodVoucherLines.voucherId, voucher.id),
       });
 
+      const transaction =
+  voucher.transactionId
+    ? await db.query.transactions.findFirst({
+        where: eq(
+          transactions.id,
+          voucher.transactionId,
+        ),
+      })
+    : null;
+
       const allRedeemed =
         lines.length > 0 &&
         lines.every((line) => line.quantityRedeemed >= line.quantityPurchased);
@@ -87,6 +101,7 @@ const nombreDelShow =
         id: voucher.id,
         voucherNumber: voucher.voucherNumber ?? null,
         transactionId: voucher.transactionId ?? null,
+        purchaseId: transaction?.purchaseId ?? null,
         createdAt: voucher.createdAt ?? null,
         customerName: voucher.customerName ?? null,
         eventName: voucher.eventName ?? null,
@@ -109,11 +124,24 @@ const nombreDelShow =
     if (searchNormalized) {
       const matchVoucher = voucher.voucherNumber?.toLowerCase().includes(searchNormalized);
       const matchCustomer = voucher.customerName?.toLowerCase().includes(searchNormalized);
-      const matchTransaction = voucher.transactionId?.toLowerCase().includes(searchNormalized);
+      const matchTransaction =
+  voucher.transactionId
+    ?.toLowerCase()
+    .includes(searchNormalized);
+
+const matchPurchase =
+  voucher.purchaseId
+    ?.toString()
+    .includes(searchNormalized);
       const matchEvent = voucher.eventName?.toLowerCase().includes(searchNormalized);
       const matchShow = voucher.showName?.toLowerCase().includes(searchNormalized);
       
-      return matchVoucher || matchCustomer || matchTransaction || matchEvent || matchShow;
+      return matchVoucher ||
+       matchCustomer ||
+       matchTransaction ||
+       matchPurchase ||
+       matchEvent ||
+       matchShow;
     }
 
     return true;
@@ -270,7 +298,7 @@ const nombreDelShow =
             {filteredVouchers.map((voucher) => (
               <tr key={voucher.id} style={{ borderBottom: "1px solid #374151" }}>
                 <td style={{ padding: "12px 16px", color: "#fdfdfd", fontWeight: "500" }}>{voucher.voucherNumber}</td>
-                <td style={{ padding: "12px 16px", color: "#ffffff" }}>{voucher.transactionId}</td>
+                <td style={{ padding: "12px 16px", color: "#ffffff" }}> {voucher.purchaseId ?? "-"}</td>
                 <td style={{ padding: "12px 16px", color: "#ffffff" }}>
                   {voucher.createdAt ? new Date(voucher.createdAt).toLocaleString("es-PE", { timeZone: "America/Lima" }) : "-"}
                 </td>
