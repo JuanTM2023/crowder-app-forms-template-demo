@@ -7,6 +7,9 @@ import { eq } from "drizzle-orm";
 import AutoRefresh from "./AutoRefresh";
 import ExportButton from "./ExportButton";
 
+import { redirect } from "next/navigation";
+import { getCurrentUser } from "@/adapters/supabase/server";
+
 export const dynamic = "force-dynamic";
 
 interface Props {
@@ -36,6 +39,13 @@ totalAmount: number;
 }
 
 export default async function AdminVouchersPage({ searchParams }: Props) {
+
+  const user = await getCurrentUser();
+
+if (!user) {
+  redirect("/login");
+}
+
   const resolvedParams = await searchParams;
   const { query, status, event, show } = resolvedParams;
   const searchNormalized = query?.toLowerCase().trim() || "";
@@ -203,6 +213,9 @@ const totalGeneral = filteredVouchers.reduce(
         <h1 style={{ margin: 0, color: "#ffffff" }}>
           Reporte de Vouchers
         </h1>
+        <div style={{ color: "#9ca3af" }}>
+  Usuario: {user.email}
+</div>
         <ExportButton searchParams={resolvedParams} />
       </div>
 
