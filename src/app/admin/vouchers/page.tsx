@@ -10,6 +10,8 @@ import ExportButton from "./ExportButton";
 import { redirect } from "next/navigation";
 import { getCurrentUser } from "@/adapters/supabase/server";
 
+import { DropdownUserProfile } from "@/components/ui/UserProfile";
+
 export const dynamic = "force-dynamic";
 
 interface Props {
@@ -216,6 +218,9 @@ const totalGeneral = filteredVouchers.reduce(
         <div style={{ color: "#9ca3af" }}>
   Usuario: {user.email}
 </div>
+
+<DropdownUserProfile />
+
         <ExportButton searchParams={resolvedParams} />
       </div>
 
