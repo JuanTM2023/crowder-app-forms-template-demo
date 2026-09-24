@@ -28,6 +28,11 @@ interface WebExtendedVoucher {
   redeemedAt: Date | null;
   publicToken: string | null;
   calculatedStatus: string;
+
+  quantity: number;
+price: number;
+serviceFee: number;
+totalAmount: number;
 }
 
 export default async function AdminVouchersPage({ searchParams }: Props) {
@@ -79,6 +84,11 @@ const uniqueShows = Array.from(
       })
     : null;
 
+    const quantity = lines.reduce(
+  (acc, line) => acc + line.quantityPurchased,
+  0,
+);
+
       const allRedeemed =
         lines.length > 0 &&
         lines.every((line) => line.quantityRedeemed >= line.quantityPurchased);
@@ -102,6 +112,15 @@ const nombreDelShow =
         voucherNumber: voucher.voucherNumber ?? null,
         transactionId: voucher.transactionId ?? null,
         purchaseId: transaction?.purchaseId ?? null,
+        quantity,
+
+price: voucher.price ?? 0,
+
+serviceFee: voucher.serviceFee ?? 0,
+
+totalAmount:
+  (voucher.price ?? 0) +
+  (voucher.serviceFee ?? 0),
         createdAt: voucher.createdAt ?? null,
         customerName: voucher.customerName ?? null,
         eventName: voucher.eventName ?? null,
@@ -135,6 +154,8 @@ const matchPurchase =
     .includes(searchNormalized);
       const matchEvent = voucher.eventName?.toLowerCase().includes(searchNormalized);
       const matchShow = voucher.showName?.toLowerCase().includes(searchNormalized);
+
+
       
       return matchVoucher ||
        matchCustomer ||
@@ -146,6 +167,26 @@ const matchPurchase =
 
     return true;
   });
+
+ const totalCantidad = filteredVouchers.reduce(
+  (acc, voucher) => acc + voucher.quantity,
+  0,
+);
+
+const totalPrecio = filteredVouchers.reduce(
+  (acc, voucher) => acc + voucher.price,
+  0,
+);
+
+const totalServicio = filteredVouchers.reduce(
+  (acc, voucher) => acc + voucher.serviceFee,
+  0,
+);
+
+const totalGeneral = filteredVouchers.reduce(
+  (acc, voucher) => acc + voucher.totalAmount,
+  0,
+);       
 
   return (
     <div
@@ -276,6 +317,36 @@ const matchPurchase =
         )}
       </form>
 
+      <div
+  style={{
+    marginBottom: "20px",
+    padding: "16px",
+    backgroundColor: "#1f2937",
+    borderRadius: "8px",
+    color: "#ffffff",
+  }}
+>
+  <div>
+    Vouchers: {filteredVouchers.length}
+  </div>
+
+  <div>
+    Cantidad: {totalCantidad}
+  </div>
+
+  <div>
+    Productos: S/ {totalPrecio.toFixed(2)}
+  </div>
+
+  <div>
+    Servicio: S/ {totalServicio.toFixed(2)}
+  </div>
+
+  <div>
+    Total General: S/ {totalGeneral.toFixed(2)}
+  </div>
+</div>
+
       <div style={{ overflowX: "auto" }}>
         <table style={{ width: "100%", borderCollapse: "collapse", textAlign: "left" }}>
           <thead>
@@ -288,6 +359,10 @@ const matchPurchase =
               <th style={{ padding: "12px 16px", fontWeight: "600", color: "#9b9b9b" }}>Show</th>
               <th style={{ padding: "12px 16px", fontWeight: "600", color: "#9b9b9b" }}>Sector</th>
               <th style={{ padding: "12px 16px", fontWeight: "600", color: "#9b9b9b" }}>Sección</th>
+              <th style={{ padding: "12px 16px", fontWeight: "600", color: "#9b9b9b" }}>Cantidad</th>
+              <th style={{ padding: "12px 16px", fontWeight: "600", color: "#9b9b9b" }}>Precio</th>
+              <th style={{ padding: "12px 16px", fontWeight: "600", color: "#9b9b9b" }}>Servicio</th>
+              <th style={{ padding: "12px 16px", fontWeight: "600", color: "#9b9b9b" }}>Total</th>
               <th style={{ padding: "12px 16px", fontWeight: "600", color: "#9b9b9b" }}>Canjeado Por</th>
               <th style={{ padding: "12px 16px", fontWeight: "600", color: "#9b9b9b" }}>Fecha Canje</th>
               <th style={{ padding: "12px 16px", fontWeight: "600", color: "#9b9b9b" }}>Estado</th>
@@ -307,6 +382,10 @@ const matchPurchase =
                 <td style={{ padding: "12px 16px", color: "#ffffff" }}>{voucher.showName}</td>
                 <td style={{ padding: "12px 16px", color: "#ffffff" }}>{voucher.sectorName}</td>
                 <td style={{ padding: "12px 16px", color: "#ffffff" }}>{voucher.sectionName ?? "-"}</td>
+                <td style={{ padding: "12px 16px", color: "#ffffff" }}>{voucher.quantity}</td>
+                <td style={{ padding: "12px 16px", color: "#ffffff" }}>S/ {voucher.price.toFixed(2)}</td>
+                <td style={{ padding: "12px 16px", color: "#ffffff" }}>S/ {voucher.serviceFee.toFixed(2)}</td>
+                <td style={{ padding: "12px 16px", color: "#ffffff" }}>S/ {voucher.totalAmount.toFixed(2)}</td>                                                                
                 <td style={{ padding: "12px 16px", color: "#ffffff" }}>{voucher.redeemedBy ?? "-"}</td>
                 <td style={{ padding: "12px 16px", color: "#ffffff" }}>
                   {voucher.redeemedAt ? new Date(voucher.redeemedAt).toLocaleString("es-PE", { timeZone: "America/Lima" }) : "-"}
@@ -332,7 +411,7 @@ const matchPurchase =
             ))}
             {filteredVouchers.length === 0 && (
               <tr>
-                <td colSpan={12} style={{ padding: "24px", color: "#9ca3af", textAlign: "center" }}>
+                <td colSpan={16} style={{ padding: "24px", color: "#9ca3af", textAlign: "center" }}>
                   No se encontraron vouchers con los filtros aplicados.
                 </td>
               </tr>
