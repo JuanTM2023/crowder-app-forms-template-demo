@@ -23,6 +23,11 @@ interface ExtendedVoucher {
   publicToken: string | null;
   calculatedStatus: string;
   resumenProductos: string;
+
+  quantity: number;
+price: number;
+serviceFee: number;
+totalAmount: number;
 }
 
 export async function exportVouchersToExcel(searchParams: { query?: string; status?: string; event?: string; show?: string }) {
@@ -36,6 +41,11 @@ export async function exportVouchersToExcel(searchParams: { query?: string; stat
       const lines = await db.query.foodVoucherLines.findMany({
         where: eq(foodVoucherLines.voucherId, voucher.id),
       });
+
+  const quantity = lines.reduce(
+  (acc, line) => acc + line.quantityPurchased,
+  0,
+);    
 
       const resumenProductos = lines
         .map((line) => {
@@ -85,6 +95,15 @@ export async function exportVouchersToExcel(searchParams: { query?: string; stat
         voucherNumber: voucher.voucherNumber ?? null,
         transactionId: voucher.transactionId ?? null,
         purchaseId: transaction?.purchaseId ?? null,
+        quantity,
+
+price: voucher.price ?? 0,
+
+serviceFee: voucher.serviceFee ?? 0,
+
+totalAmount:
+  (voucher.price ?? 0) +
+  (voucher.serviceFee ?? 0),
         createdAt: voucher.createdAt ?? null,
         customerName: voucher.customerName ?? null,
         eventName: voucher.eventName ?? null,
@@ -116,6 +135,26 @@ export async function exportVouchersToExcel(searchParams: { query?: string; stat
     return true;
   });
 
+  const totalCantidad = filteredVouchers.reduce(
+  (acc, voucher) => acc + voucher.quantity,
+  0,
+);
+
+const totalPrecio = filteredVouchers.reduce(
+  (acc, voucher) => acc + voucher.price,
+  0,
+);
+
+const totalServicio = filteredVouchers.reduce(
+  (acc, voucher) => acc + voucher.serviceFee,
+  0,
+);
+
+const totalGeneral = filteredVouchers.reduce(
+  (acc, voucher) => acc + voucher.totalAmount,
+  0,
+);
+
   const getStatusText = (status: string) => {
     if (status === "redeemed") return "Canjeado";
     if (status === "partial") return "Parcial";
@@ -138,6 +177,10 @@ export async function exportVouchersToExcel(searchParams: { query?: string; stat
             <th>Show</th>
             <th>Sector</th>
             <th>Sección</th>
+            <th>Cantidad</th>
+            <th>Precio</th>
+            <th>Servicio</th>
+            <th>Total</th>
             <th>Resumen</th>
             <th>Estado</th>
             <th>Entregado por</th>
@@ -160,8 +203,17 @@ export async function exportVouchersToExcel(searchParams: { query?: string; stat
         <td>${voucher.eventName ?? "-"}</td>
         <td>${voucher.showName}</td>
         <td>${voucher.sectorName ?? "-"}</td>
-        <td>${voucher.sectionName ?? "-"}</td>
-        <td>${voucher.resumenProductos}</td>
+<td>${voucher.sectionName ?? "-"}</td>
+
+<td>${voucher.quantity}</td>
+
+<td>S/ ${voucher.price.toFixed(2)}</td>
+
+<td>S/ ${voucher.serviceFee.toFixed(2)}</td>
+
+<td>S/ ${voucher.totalAmount.toFixed(2)}</td>
+
+<td>${voucher.resumenProductos}</td>
         <td>${getStatusText(voucher.calculatedStatus)}</td>
         <td>${voucher.redeemedBy ?? "-"}</td>
         <td>${fechaEntrega}</td>
@@ -169,12 +221,23 @@ export async function exportVouchersToExcel(searchParams: { query?: string; stat
     `;
   });
 
-  html += `
+html += `
+<tr style="font-weight:bold;background:#e5e7eb;">
+  <td colspan="7">TOTALES</td>
+  <td>${totalCantidad}</td>
+  <td>${totalPrecio.toFixed(2)}</td>
+  <td>${totalServicio.toFixed(2)}</td>
+  <td>${totalGeneral.toFixed(2)}</td>
+  <td colspan="5"></td>
+</tr>
+`;
+
+html += `
         </tbody>
       </table>
     </body>
     </html>
-  `;
+`;
 
   return html;
 }
