@@ -1,5 +1,7 @@
 import { db } from "@/lib/db";
 
+import Link from "next/link";
+
 export const dynamic = "force-dynamic";
 
   interface Props {
@@ -46,9 +48,9 @@ const filteredUsers = users.filter(
 </form>
 
 <div className="mt-4 flex justify-end">
-  <a
-    href="/settings/users/new">nuevo Usuario
-  </a>
+  <Link
+    href="/settings/users/new">+ nuevo Usuario
+  </Link>
 </div>
 
 <div className="mt-8 overflow-x-auto">
@@ -109,8 +111,8 @@ const filteredUsers = users.filter(
           </td>
 
           <td className="p-3">
-          <a href={`/settings/users/${user.id}`}>Acciones
-          </a>
+          <link href={`/settings/users/${user.id}`}>Acciones
+          </link>
           </td>
         </tr>
       ))}
