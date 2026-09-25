@@ -49,7 +49,7 @@ const filteredUsers = users.filter(
 
 <div className="mt-4 flex justify-end">
   <Link
-    href="/settings/users/new">+ nuevo Usuario
+    href={`/settings/users/new`}>+ nuevo Usuario
   </Link>
 </div>
 
