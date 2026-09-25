@@ -15,6 +15,9 @@ const TABS = [
   { key: "maintenance", label: "Mantenimiento", href: `${base}/maintenance` },
   { key: "integrations", label: "Integraciones", href: siteConfig.baseLinks.integrations },
   { key: "webhooks", label: "Webhooks", href: siteConfig.baseLinks.webhooks },
+
+  { key: "producers", label: "Productoras", href: "/settings/producers" },
+  { key: "users", label: "Usuarios", href: "/settings/users" },
 ]
 
 export function SettingsTabs() {

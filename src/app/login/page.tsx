@@ -93,8 +93,11 @@ function LoginInner() {
         setErrorMessage(mapAuthError(error.message, mode))
         return
       }
-      const next = safeNextPath(searchParams.get("next"))
-      window.location.assign(next)
+const next =
+  safeNextPath(searchParams.get("next")) ||
+  "/admin/vouchers";
+
+window.location.assign(next);
       return
     }
 

@@ -13,7 +13,6 @@ const navItems = [
   { href: siteConfig.baseLinks.catalogs, label: "Catálogos" },
   { href: siteConfig.baseLinks.transactions, label: "Transacciones" },
   { href: siteConfig.baseLinks.settings, label: "Configuración" },
-  { href: siteConfig.baseLinks.producers, label: "Productores" },
 ];
 
 function isActive(pathname: string, href: string) {
