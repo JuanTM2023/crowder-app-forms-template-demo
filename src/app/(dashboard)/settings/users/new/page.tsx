@@ -18,7 +18,7 @@ export default async function NewUserPage() {
           <input
             name="fullName"
             placeholder="Nombre completo"
-            className="w-full rounded-xl border border-border bg-background px-4 py-3 text-black"
+            className="w-full rounded-xl border border-border background-white px-4 py-3 text-black"
           />
 
           <select
