@@ -60,6 +60,7 @@ const filteredUsers = users.filter(
         <th className="p-3 text-left">Rol</th>
         <th className="p-3 text-left">Productora</th>
         <th className="p-3 text-left">Estado</th>
+        <th className="p-3 text-left">Acciones</th>
       </tr>
     </thead>
 
@@ -87,6 +88,11 @@ const filteredUsers = users.filter(
 
           <td className="p-3">
             {user.active ? "Activo" : "Inactivo"}
+          </td>
+
+          <td className="p-3">
+          <a href={`/settings/users/${user.id}`}>Acciones
+          </a>
           </td>
         </tr>
       ))}
