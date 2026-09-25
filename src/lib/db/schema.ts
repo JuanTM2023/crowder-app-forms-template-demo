@@ -204,6 +204,15 @@ export const internalUsers = pgTable("internal_users", {
 
   fullName: text("full_name")
     .notNull(),
+  
+  documentNumber: text("document_number")
+  .notNull(),
+  
+  phone: text("phone"),
+
+  birthDate: timestamp("birth_date", {
+  withTimezone: true,
+  }),  
 
   role: text("role")
     .notNull(),
