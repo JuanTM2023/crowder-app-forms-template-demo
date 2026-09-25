@@ -18,7 +18,7 @@ export default async function NewUserPage() {
           <input
             name="fullName"
             placeholder="Nombre completo"
-            className="w-full rounded-xl border border-border px-4 py-3 text-black"
+            className="w-full rounded-xl border border-border bg-background px-4 py-3 text-black"
           />
 
           <select
@@ -50,31 +50,31 @@ export default async function NewUserPage() {
           <input
             name="documentNumber"
             placeholder="Número Documento"
-            className="w-full rounded-xl border border-border px-4 py-3 text-black"
+            className="w-full rounded-xl border border-border bg-background px-4 py-3 text-black"
           />
 
           <input
             name="email"
             type="email"
             placeholder="Correo"
-            className="w-full rounded-xl border border-border px-4 py-3 text-black"
+            className="w-full rounded-xl border border-border bg-background px-4 py-3 text-black"
           />
 
           <input
             name="phone"
             placeholder="Teléfono"
-            className="w-full rounded-xl border border-border px-4 py-3 text-black"
+            className="w-full rounded-xl border border-border bg-background px-4 py-3 text-black"
           />
 
           <input
             type="date"
             name="birthDate"
-            className="w-full rounded-xl border border-border px-4 py-3 text-black"
+            className="w-full rounded-xl border border-border bg-background px-4 py-3 text-black"
           />
 
           <select
             name="role"
-            className="w-full rounded-xl border border-border px-4 py-3 text-black"
+            className="w-full rounded-xl border border-border bg-background px-4 py-3 text-black"
           >
               <option value="">
               Seleccione un Rol
@@ -95,7 +95,7 @@ export default async function NewUserPage() {
 
           <select
             name="producerCode"
-            className="w-full rounded-xl border border-border px-4 py-3 text-black"
+            className="w-full rounded-xl border border-border bg-background px-4 py-3 text-black"
           >
             <option value="">
               Sin Productora
