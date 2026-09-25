@@ -75,6 +75,7 @@ const vouchers =
           internalUser.producerCode ?? "",
         ),
       });
+   
   
   const uniqueEvents = Array.from(
     new Set(
@@ -244,6 +245,10 @@ const totalGeneral = filteredVouchers.reduce(
 <div style={{ color: "#9ca3af" }}>
   Rol: {internalUser.role}
 </div>
+
+ <div style={{ color: "#9ca3af" }}>
+  Productora: {internalUser.producerCode ?? "TODAS"}
+</div>  
 
 <DropdownUserProfile />
 
