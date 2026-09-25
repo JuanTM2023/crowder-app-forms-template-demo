@@ -23,14 +23,14 @@ export default async function NewUserPage() {
 
           <select
   name="documentType"
-  className="w-full rounded-xl border border-border px-4 py-3"
+  className="w-full rounded-xl border border-border px-4 py-3 text-black"
   required
 >
   <option value="">
     Seleccione tipo
   </option>
 
-  <option className="text-3xl font-bold" value="DNI">
+  <option value="DNI">
     DNI
   </option>
 
@@ -74,7 +74,7 @@ export default async function NewUserPage() {
 
           <select
             name="role"
-            className="w-full rounded-xl border border-border px-4 py-3"
+            className="w-full rounded-xl border border-border px-4 py-3 text-black"
           >
             <option value="ADMIN">
               ADMIN
@@ -91,7 +91,7 @@ export default async function NewUserPage() {
 
           <select
             name="producerCode"
-            className="w-full rounded-xl border border-border px-4 py-3"
+            className="w-full rounded-xl border border-border px-4 py-3 text-black"
           >
             <option value="">
               Sin Productora
