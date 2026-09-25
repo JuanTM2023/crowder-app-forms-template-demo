@@ -9,6 +9,7 @@ import { DropdownUserProfile } from "./UserProfile";
 
 const navItems = [
   { href: siteConfig.baseLinks.overview, label: "Resumen" },
+  { href: "/admin/vouchers", label: "Reportes" },
   { href: siteConfig.baseLinks.forms, label: "Formularios" },
   { href: siteConfig.baseLinks.catalogs, label: "Catálogos" },
   { href: siteConfig.baseLinks.transactions, label: "Transacciones" },
