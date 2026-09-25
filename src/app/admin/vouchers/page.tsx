@@ -1,6 +1,7 @@
 import { db } from "@/lib/db";
 import {
-foodVoucherLines,
+  foodVoucherLines,
+  foodVouchers,
   transactions,
 } from "@/lib/db/schema";
 import { eq } from "drizzle-orm";
@@ -65,7 +66,15 @@ if (!internalUser.active) {
   const { query, status, event, show } = resolvedParams;
   const searchNormalized = query?.toLowerCase().trim() || "";
 
-  const vouchers = await db.query.foodVouchers.findMany();
+const vouchers =
+  internalUser.role === "ADMIN"
+    ? await db.query.foodVouchers.findMany()
+    : await db.query.foodVouchers.findMany({
+        where: eq(
+          foodVouchers.producerCode,
+          internalUser.producerCode ?? "",
+        ),
+      });
   
   const uniqueEvents = Array.from(
     new Set(

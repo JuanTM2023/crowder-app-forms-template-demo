@@ -747,6 +747,8 @@ export const foodVouchers = pgTable("food_vouchers", {
 
   eventName: text("event_name").notNull(),
 
+  producerCode: text("producer_code"),
+
 showName: text("show_name"),
 
   sectorName: text("sector_name"),
