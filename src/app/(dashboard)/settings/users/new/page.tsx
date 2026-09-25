@@ -1,5 +1,7 @@
 import { db } from "@/lib/db";
 
+import { createUserAction } from "./actions";
+
 export const dynamic = "force-dynamic";
 
 export default async function NewUserPage() {
@@ -13,7 +15,7 @@ export default async function NewUserPage() {
       </h1>
 
       <div className="mt-6 max-w-2xl">
-        <form className="space-y-4">
+        <form action={createUserAction}>
 
           <input
             name="fullName"
