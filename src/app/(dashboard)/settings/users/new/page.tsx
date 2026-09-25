@@ -69,13 +69,17 @@ export default async function NewUserPage() {
           <input
             type="date"
             name="birthDate"
-            className="w-full rounded-xl border border-border px-4 py-3"
+            className="w-full rounded-xl border border-border px-4 py-3 text-black"
           />
 
           <select
             name="role"
             className="w-full rounded-xl border border-border px-4 py-3 text-black"
           >
+              <option value="">
+              Seleccione un Rol
+              </option>
+
             <option value="ADMIN">
               ADMIN
             </option>
