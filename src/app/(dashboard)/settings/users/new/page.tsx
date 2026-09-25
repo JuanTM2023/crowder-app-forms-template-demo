@@ -30,7 +30,7 @@ export default async function NewUserPage() {
     Seleccione tipo
   </option>
 
-  <option value="DNI">
+  <option className="text-3xl font-bold" value="DNI">
     DNI
   </option>
 
@@ -46,23 +46,6 @@ export default async function NewUserPage() {
     RUC
   </option>
 </select>
-
-          <select
-            name="documentType"
-            className="w-full rounded-xl border border-border px-4 py-3"
-          >
-            <option value="DNI">
-              DNI
-            </option>
-
-            <option value="CE">
-              Carnet Extranjería
-            </option>
-
-            <option value="PASSPORT">
-              Pasaporte
-            </option>
-          </select>
 
           <input
             name="documentNumber"
