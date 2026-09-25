@@ -1,124 +1,88 @@
-import { db } from "@/lib/db";
+import { db } from "@/lib/db"; 
+import Link from "next/link"; 
 
-import Link from "next/link";
+export const dynamic = "force-dynamic"; 
 
-export const dynamic = "force-dynamic";
+interface Props { 
+  searchParams: Promise<{ q?: string; }>; 
+} 
 
-  interface Props {
-  searchParams: Promise<{
-    q?: string;
-  }>;
-}
+export default async function UsersPage({ searchParams }: Props) { 
+  // 1. Resolvemos searchParams primero para evitar problemas de sincronía
+  const { q = "" } = await searchParams; 
 
-export default async function UsersPage({
-  searchParams,
-}: Props) {
-  const users = await db.query.internalUsers.findMany();
+  // 2. Traemos los usuarios de la base de datos
+  const users = await db.query.internalUsers.findMany(); 
 
-const { q = "" } = await searchParams;
+  // 3. Filtramos los usuarios basados en la query de búsqueda
+  const filteredUsers = users.filter( 
+    (user) => 
+      user.fullName?.toLowerCase().includes(q.toLowerCase()) || 
+      user.email?.toLowerCase().includes(q.toLowerCase()) 
+  ); 
 
-const filteredUsers = users.filter(
-  (user) =>
-    user.fullName
-      .toLowerCase()
-      .includes(q.toLowerCase()) ||
-    user.email
-      .toLowerCase()
-      .includes(q.toLowerCase())
-);
+  return ( 
+    <main className="p-6"> 
+      <h1 className="text-3xl font-bold"> Usuarios </h1> 
+      <p className="mt-2 text-sm text-muted-foreground"> 
+        Administración de usuarios internos. 
+      </p> 
 
-  return (
-    <main className="p-6">
-      <h1 className="text-3xl font-bold">
-        Usuarios
-      </h1>
+      <form className="mt-6"> 
+        <input 
+          type="text" 
+          name="q" 
+          defaultValue={q} 
+          placeholder="Buscar usuario..." 
+          className="w-full max-w-md rounded-xl border border-border bg-background px-4 py-3" 
+        /> 
+      </form> 
 
-      <p className="mt-2 text-sm text-muted-foreground">
-        Administración de usuarios internos.
-      </p>
+      <div className="mt-4 flex justify-end"> 
+        <Link href={`/settings/users/new`} className="text-blue-600 hover:underline">
+          + Nuevo Usuario 
+        </Link> 
+      </div> 
 
-      <form className="mt-6">
-  <input
-    type="text"
-    name="q"
-    defaultValue={q}
-    placeholder="Buscar usuario..."
-    className="w-full max-w-md rounded-xl border border-border bg-background px-4 py-3"
-  />
-</form>
-
-<div className="mt-4 flex justify-end">
-  <Link
-    href={`/settings/users/new`}>+ nuevo Usuario
-  </Link>
-</div>
-
-<div className="mt-8 overflow-x-auto">
-  <table className="w-full border-collapse">
-    <thead>
-      <tr className="border-b border-border">
-        <th className="p-3 text-left">Nombre</th>
-        <th className="p-3 text-left">Documento</th>        
-        <th className="p-3 text-left">Correo</th>
-        <th className="p-3 text-left">Teléfono</th>
-        <th className="p-3 text-left">Nacimiento</th>
-        <th className="p-3 text-left">Rol</th>
-        <th className="p-3 text-left">Productora</th>
-        <th className="p-3 text-left">Estado</th>
-        <th className="p-3 text-left">Acciones</th>
-      </tr>
-    </thead>
-
-    <tbody>
-      {filteredUsers.map((user) => (
-        <tr
-          key={user.id}
-          className="border-b border-border"
-        >
-          <td className="p-3">
-            {user.fullName}
-          </td>
-
-          <td className="p-3">
-            {user.documentNumber}
-            </td>
-
-          <td className="p-3">
-            {user.email}
-          </td>
-
-          <td className="p-3">
-            {user.phone ?? "-"}
-            </td>
-
-          <td className="p-3">
-           {user.birthDate
-           ? new Date(user.birthDate).toLocaleDateString()
-           : "-"
-           }
-           </td>
-
-          <td className="p-3">
-            {user.role}
-          </td>
-
-          <td className="p-3">
-            {user.producerCode ?? "-"}
-          </td>
-
-          <td className="p-3">
-            {user.active ? "Activo" : "Inactivo"}
-          </td>
-
-          <td className="p-3">
-          <link href={`/settings/users/${user.id}`}>Acciones
-          </link>
-          </td>
-        </tr>
-      ))}
-    </tbody>
-  </table>
-</div>
-    </main>
-  );
+      <div className="mt-8 overflow-x-auto"> 
+        <table className="w-full border-collapse"> 
+          <thead> 
+            <tr className="border-b border-border"> 
+              <th className="p-3 text-left">Nombre</th> 
+              <th className="p-3 text-left">Documento</th> 
+              <th className="p-3 text-left">Correo</th> 
+              <th className="p-3 text-left">Teléfono</th> 
+              <th className="p-3 text-left">Nacimiento</th> 
+              <th className="p-3 text-left">Rol</th> 
+              <th className="p-3 text-left">Productora</th> 
+              <th className="p-3 text-left">Estado</th> 
+              <th className="p-3 text-left">Acciones</th> 
+            </tr> 
+          </thead> 
+          <tbody> 
+            {filteredUsers.map((user) => ( 
+              <tr key={user.id} className="border-b border-border hover:bg-muted/50"> 
+                <td className="p-3"> {user.fullName} </td> 
+                <td className="p-3"> {user.documentNumber} </td> 
+                <td className="p-3"> {user.email} </td> 
+                <td className="p-3"> {user.phone ?? "-"} </td> 
+                <td className="p-3"> 
+                  {user.birthDate ? new Date(user.birthDate).toLocaleDateString() : "-"} 
+                </td> 
+                <td className="p-3"> {user.role} </td> 
+                <td className="p-3"> {user.producerCode ?? "-"} </td> 
+                <td className="p-3"> {user.active ? "Activo" : "Inactivo"} </td> 
+                <td className="p-3"> 
+                  {/* CORREGIDO: Se cambió <link> por <Link> */}
+                  <Link href={`/settings/users/${user.id}`} className="text-blue-600 hover:underline">
+                    Ver detalles
+                  </Link> 
+                </td> 
+              </tr> 
+            ))} 
+          </tbody> 
+        </table> 
+      </div> 
+    </main> 
+  ); 
 }
