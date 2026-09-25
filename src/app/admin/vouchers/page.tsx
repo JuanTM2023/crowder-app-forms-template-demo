@@ -12,6 +12,8 @@ import { getCurrentUser } from "@/adapters/supabase/server";
 
 import { DropdownUserProfile } from "@/components/ui/UserProfile";
 
+import { getInternalUser } from "@/lib/internal-user";
+
 export const dynamic = "force-dynamic";
 
 interface Props {
@@ -42,9 +44,20 @@ totalAmount: number;
 
 export default async function AdminVouchersPage({ searchParams }: Props) {
 
-  const user = await getCurrentUser();
+const user = await getCurrentUser();
 
 if (!user) {
+  redirect("/login");
+}
+
+const internalUser =
+  await getInternalUser();
+
+if (!internalUser) {
+  redirect("/login");
+}
+
+if (!internalUser.active) {
   redirect("/login");
 }
 
@@ -215,8 +228,12 @@ const totalGeneral = filteredVouchers.reduce(
         <h1 style={{ margin: 0, color: "#ffffff" }}>
           Reporte de Vouchers
         </h1>
-        <div style={{ color: "#9ca3af" }}>
-  Usuario: {user.email}
+<div style={{ color: "#9ca3af" }}>
+  Usuario: {internalUser.fullName}
+</div>
+
+<div style={{ color: "#9ca3af" }}>
+  Rol: {internalUser.role}
 </div>
 
 <DropdownUserProfile />

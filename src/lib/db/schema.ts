@@ -193,6 +193,34 @@ export const producers = pgTable("producers", {
     .defaultNow(),
 });
 
+export const internalUsers = pgTable("internal_users", {
+  id: uuid("id")
+    .defaultRandom()
+    .primaryKey(),
+
+  email: text("email")
+    .notNull()
+    .unique(),
+
+  fullName: text("full_name")
+    .notNull(),
+
+  role: text("role")
+    .notNull(),
+
+  producerCode: text("producer_code"),
+
+  active: boolean("active")
+    .notNull()
+    .default(true),
+
+  createdAt: timestamp("created_at", {
+    withTimezone: true,
+  })
+    .notNull()
+    .defaultNow(),
+});
+
 // catalogs — conjunto de productos. source = manual (vida propia) o
 // source = <proveedor> (sincronizado desde su credencial).
 export const catalogs = pgTable("catalogs", {
