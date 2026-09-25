@@ -18,7 +18,7 @@ export default async function NewUserPage() {
           <input
             name="fullName"
             placeholder="Nombre completo"
-            className="w-full rounded-xl border border-border px-4 py-3"
+            className="w-full rounded-xl border border-border px-4 py-3 text-black"
           />
 
           <select
@@ -50,20 +50,20 @@ export default async function NewUserPage() {
           <input
             name="documentNumber"
             placeholder="Número Documento"
-            className="w-full rounded-xl border border-border px-4 py-3"
+            className="w-full rounded-xl border border-border px-4 py-3 text-black"
           />
 
           <input
             name="email"
             type="email"
             placeholder="Correo"
-            className="w-full rounded-xl border border-border px-4 py-3"
+            className="w-full rounded-xl border border-border px-4 py-3 text-black"
           />
 
           <input
             name="phone"
             placeholder="Teléfono"
-            className="w-full rounded-xl border border-border px-4 py-3"
+            className="w-full rounded-xl border border-border px-4 py-3 text-black"
           />
 
           <input
