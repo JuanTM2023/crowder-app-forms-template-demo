@@ -2,8 +2,28 @@ import { db } from "@/lib/db";
 
 export const dynamic = "force-dynamic";
 
-export default async function UsersPage() {
+  interface Props {
+  searchParams: Promise<{
+    q?: string;
+  }>;
+}
+
+export default async function UsersPage({
+  searchParams,
+}: Props) {
   const users = await db.query.internalUsers.findMany();
+
+const { q = "" } = await searchParams;
+
+const filteredUsers = users.filter(
+  (user) =>
+    user.fullName
+      .toLowerCase()
+      .includes(q.toLowerCase()) ||
+    user.email
+      .toLowerCase()
+      .includes(q.toLowerCase())
+);
 
   return (
     <main className="p-6">
@@ -15,19 +35,64 @@ export default async function UsersPage() {
         Administración de usuarios internos.
       </p>
 
-      <div className="mt-8">
-        {users.map((user) => (
-          <div
-            key={user.id}
-            className="mb-4 rounded-xl border border-border p-4"
-          >
-            <div>{user.fullName}</div>
-            <div>{user.email}</div>
-            <div>{user.role}</div>
-            <div>{user.producerCode ?? "-"}</div>
-          </div>
-        ))}
-      </div>
+      <form className="mt-6">
+  <input
+    type="text"
+    name="q"
+    defaultValue={q}
+    placeholder="Buscar usuario..."
+    className="w-full max-w-md rounded-xl border border-border bg-background px-4 py-3"
+  />
+</form>
+
+<div className="mt-4 flex justify-end">
+  <a
+    href="/settings/users/new">nuevo Usuario
+  </a>
+</div>
+
+<div className="mt-8 overflow-x-auto">
+  <table className="w-full border-collapse">
+    <thead>
+      <tr className="border-b border-border">
+        <th className="p-3 text-left">Nombre</th>
+        <th className="p-3 text-left">Correo</th>
+        <th className="p-3 text-left">Rol</th>
+        <th className="p-3 text-left">Productora</th>
+        <th className="p-3 text-left">Estado</th>
+      </tr>
+    </thead>
+
+    <tbody>
+      {filteredUsers.map((user) => (
+        <tr
+          key={user.id}
+          className="border-b border-border"
+        >
+          <td className="p-3">
+            {user.fullName}
+          </td>
+
+          <td className="p-3">
+            {user.email}
+          </td>
+
+          <td className="p-3">
+            {user.role}
+          </td>
+
+          <td className="p-3">
+            {user.producerCode ?? "-"}
+          </td>
+
+          <td className="p-3">
+            {user.active ? "Activo" : "Inactivo"}
+          </td>
+        </tr>
+      ))}
+    </tbody>
+  </table>
+</div>
     </main>
   );
 }
