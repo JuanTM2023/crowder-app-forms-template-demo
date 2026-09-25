@@ -49,7 +49,8 @@ export default async function UsersPage({ searchParams }: Props) {
           <thead> 
             <tr className="border-b border-border"> 
               <th className="p-3 text-left">Nombre</th> 
-              <th className="p-3 text-left">Documento</th> 
+              <th className="p-3 text-left">Tipo Documento</th>              
+              <th className="p-3 text-left">N. Documento</th>                
               <th className="p-3 text-left">Correo</th> 
               <th className="p-3 text-left">Teléfono</th> 
               <th className="p-3 text-left">Nacimiento</th> 
@@ -63,6 +64,7 @@ export default async function UsersPage({ searchParams }: Props) {
             {filteredUsers.map((user) => ( 
               <tr key={user.id} className="border-b border-border hover:bg-muted/50"> 
                 <td className="p-3"> {user.fullName} </td> 
+                <td className="p-3"> {user.documentType ?? "-"} </td>                
                 <td className="p-3"> {user.documentNumber} </td> 
                 <td className="p-3"> {user.email} </td> 
                 <td className="p-3"> {user.phone ?? "-"} </td> 

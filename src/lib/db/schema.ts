@@ -205,9 +205,11 @@ export const internalUsers = pgTable("internal_users", {
   fullName: text("full_name")
     .notNull(),
   
+  documentType: text("document_type"),  
+  
   documentNumber: text("document_number")
   .notNull(),
-  
+
   phone: text("phone"),
 
   birthDate: timestamp("birth_date", {
