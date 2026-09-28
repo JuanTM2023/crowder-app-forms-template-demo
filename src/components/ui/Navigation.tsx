@@ -7,13 +7,23 @@ import { usePathname } from "next/navigation";
 import { Logo } from "../../../public/Logo";
 import { DropdownUserProfile } from "./UserProfile";
 
-const navItems = [
+const adminMenu = [
   { href: siteConfig.baseLinks.overview, label: "Resumen" },
   { href: "/reports", label: "Reportes" },
   { href: siteConfig.baseLinks.forms, label: "Formularios" },
   { href: siteConfig.baseLinks.catalogs, label: "Catálogos" },
   { href: siteConfig.baseLinks.transactions, label: "Transacciones" },
   { href: siteConfig.baseLinks.settings, label: "Configuración" },
+];
+
+const supervisorMenu = [
+  { href: siteConfig.baseLinks.overview, label: "Resumen" },
+  { href: "/reports", label: "Reportes" },
+];
+
+const operarioMenu = [
+  { href: siteConfig.baseLinks.overview, label: "Resumen" },
+  { href: "/reports", label: "Reportes" },
 ];
 
 function isActive(pathname: string, href: string) {
@@ -23,6 +33,16 @@ function isActive(pathname: string, href: string) {
 
 function Navigation() {
   const pathname = usePathname();
+  const role: string = "ADMIN";
+let navItems = adminMenu;
+
+if (role === "SUPERVISOR") {
+  navItems = supervisorMenu;
+}
+
+if (role === "OPERARIO") {
+  navItems = operarioMenu;
+}  
   return (
     <div className="shadow-s sticky top-0 z-20 bg-background">
       <div className="mx-auto flex max-w-7xl items-center justify-between px-4 sm:px-6 pt-3">
