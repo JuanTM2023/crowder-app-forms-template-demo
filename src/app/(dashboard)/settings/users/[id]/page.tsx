@@ -12,10 +12,20 @@ interface Props {
   params: Promise<{
     id: string;
   }>;
+
+  searchParams: Promise<{
+    password?: string;
+  }>;
 }
 
-export default async function EditUserPage({ params }: Props) {
+export default async function EditUserPage({
+  params,
+  searchParams,
+}: Props) {
   const { id } = await params;
+
+  const { password } =
+  await searchParams;
 
   const user = await db.query.internalUsers.findFirst({
     where: eq(internalUsers.id, id),
@@ -118,6 +128,23 @@ export default async function EditUserPage({ params }: Props) {
           >
             Restablecer Contraseña
           </button>
+
+          {password && (
+  <div className="mt-4 rounded-xl border border-green-500 bg-green-50 p-4">
+    <div className="font-semibold text-green-700">
+      Contraseña actualizada correctamente
+    </div>
+
+    <div className="mt-3 text-sm">
+      Nueva contraseña temporal:
+    </div>
+
+    <div className="mt-2 rounded bg-white p-3 font-mono text-lg">
+      {password}
+    </div>
+  </div>
+)}
+
         </form>
       </div>
     </main>

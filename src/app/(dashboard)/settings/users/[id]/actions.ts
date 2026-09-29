@@ -81,5 +81,7 @@ export async function resetPasswordAction(
     password,
   );
 
-  redirect("/settings/users");
+  redirect(
+    `/settings/users/${id}?password=${encodeURIComponent(password)}`
+);
 }
