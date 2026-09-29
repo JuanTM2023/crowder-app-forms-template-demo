@@ -79,8 +79,8 @@ const { error } =
   await supabase.auth.resetPasswordForEmail(
     user.email,
     {
-      redirectTo:
-        "https://crowder-app-forms-template-demo-3m5.vercel.app/update-password",
+redirectTo:
+  "https://crowder-app-forms-template-demo-3m5.vercel.app/auth/callback?next=/update-password"
     },
   );
 
