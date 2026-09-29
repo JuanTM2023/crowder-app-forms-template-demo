@@ -135,11 +135,11 @@ export default async function EditUserPage({
       Contraseña actualizada correctamente
     </div>
 
-    <div className="mt-3 text-sm">
-      Nueva contraseña temporal:
+    <div className="mt-3 text-sm text-green-700">
+      Nueva contraseña:
     </div>
 
-    <div className="mt-2 rounded bg-white p-3 font-mono text-lg">
+    <div className="mt-2 rounded bg-white p-3 font-mono text-green-700">
       {password}
     </div>
   </div>
