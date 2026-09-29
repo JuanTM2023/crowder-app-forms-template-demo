@@ -73,14 +73,14 @@ export async function resetPasswordAction(
   const supabase =
     getServiceSupabase();
 
-  const { error } =
-    await supabase.auth.resetPasswordForEmail(
-      user.email,
-      {
-        redirectTo:
-          "https://crowder-app-forms-template-demo-3m5.vercel.app/update-password",
-      },
-    );
+const { error } =
+  await supabase.auth.resetPasswordForEmail(
+    user.email,
+    {
+      redirectTo:
+        "https://crowder-app-forms-template-demo-3m5.vercel.app/update-password",
+    },
+  );
 
   if (error) {
     throw new Error(
