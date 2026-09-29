@@ -14,7 +14,7 @@ interface Props {
   }>;
 
   searchParams: Promise<{
-    password?: string;
+    emailSent?: string;
   }>;
 }
 
@@ -24,8 +24,9 @@ export default async function EditUserPage({
 }: Props) {
   const { id } = await params;
 
-  const { password } =
+  const { emailSent } =
   await searchParams;
+
 
   const user = await db.query.internalUsers.findFirst({
     where: eq(internalUsers.id, id),
@@ -129,18 +130,14 @@ export default async function EditUserPage({
             Restablecer Contraseña
           </button>
 
-          {password && (
+{emailSent && (
   <div className="mt-4 rounded-xl border border-green-500 bg-green-50 p-4">
     <div className="font-semibold text-green-700">
-      Contraseña actualizada correctamente
+      ✅ Correo enviado correctamente
     </div>
 
-    <div className="mt-3 text-sm text-green-700">
-      Nueva contraseña:
-    </div>
-
-    <div className="mt-2 rounded bg-white p-3 font-mono text-green-700">
-      {password}
+    <div className="mt-2 text-sm text-gray-700">
+      Se envió un enlace de recuperación al correo del usuario.
     </div>
   </div>
 )}

@@ -61,35 +61,35 @@ export async function resetPasswordAction(
   const id =
     formData.get("id") as string;
 
+  const user =
+    await db.query.internalUsers.findFirst({
+      where: eq(internalUsers.id, id),
+    });
+
+  if (!user) {
+    throw new Error("Usuario no encontrado");
+  }
+
   const supabase =
     getServiceSupabase();
 
-  const password =
-    Math.random()
-      .toString(36)
-      .slice(-10) + "!";
+  const { error } =
+    await supabase.auth.resetPasswordForEmail(
+      user.email,
+      {
+        redirectTo:
+          "https://crowder-app-forms-template-demo-3m5.vercel.app/update-password",
+      },
+    );
 
-const { data, error } =
-  await supabase.auth.admin.updateUserById(
-    id,
-    {
-      password,
-    },
-  );
-
-console.log("RESET DATA:", data);
-console.log("RESET ERROR:", error);
-
-if (error) {
-  throw new Error(error.message);
-}
-
-console.log(
-  "Nueva contraseña:",
-  password,
-);
+  if (error) {
+    throw new Error(
+      error.message ??
+        "Error enviando correo de recuperación",
+    );
+  }
 
   redirect(
-    `/settings/users/${id}?password=${encodeURIComponent(password)}`
-);
+    `/settings/users/${id}?emailSent=true`,
+  );
 }
