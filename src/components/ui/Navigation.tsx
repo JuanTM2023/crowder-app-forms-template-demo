@@ -26,23 +26,28 @@ const operarioMenu = [
   { href: "/reports", label: "Reportes" },
 ];
 
+interface NavigationProps {
+  role?: string;
+}
+
 function isActive(pathname: string, href: string) {
   if (href === "/") return pathname === "/";
   return pathname === href || pathname.startsWith(href + "/");
 }
 
-function Navigation() {
+function Navigation({
+  role,
+}: NavigationProps) {
   const pathname = usePathname();
-  const role: string = "ADMIN";
+
 let navItems = adminMenu;
 
 if (role === "SUPERVISOR") {
   navItems = supervisorMenu;
+} else if (role === "OPERARIO") {
+  navItems = operarioMenu;
 }
 
-if (role === "OPERARIO") {
-  navItems = operarioMenu;
-}  
   return (
     <div className="shadow-s sticky top-0 z-20 bg-background">
       <div className="mx-auto flex max-w-7xl items-center justify-between px-4 sm:px-6 pt-3">
