@@ -40,6 +40,8 @@ function Navigation({
 }: NavigationProps) {
   const pathname = usePathname();
 
+  console.log("ROLE RECIBIDO:", role);
+
 let navItems = adminMenu;
 
 if (role === "SUPERVISOR") {
@@ -50,15 +52,23 @@ if (role === "SUPERVISOR") {
 
   return (
     <div className="shadow-s sticky top-0 z-20 bg-background">
-      <div className="mx-auto flex max-w-7xl items-center justify-between px-4 sm:px-6 pt-3">
-        <div>
-          <span className="sr-only">Crowder Partner Forms</span>
-          <Logo className="h-6" />
-        </div>
-        <div className="flex h-[42px] flex-nowrap gap-1">
-          <DropdownUserProfile />
-        </div>
-      </div>
+<div className="mx-auto flex max-w-7xl items-center justify-between px-4 sm:px-6 pt-3">
+  <div>
+    <span className="sr-only">
+      Crowder Partner Forms
+    </span>
+
+    <Logo className="h-6" />
+
+    <div className="mt-1 text-xs text-red-500">
+      ROLE: {role ?? "SIN ROL"}
+    </div>
+  </div>
+
+  <div className="flex h-[42px] flex-nowrap gap-1">
+    <DropdownUserProfile />
+  </div>
+</div>
       <nav className="mt-5 border-b border-border">
         <ul className="mx-auto flex w-full max-w-7xl items-center px-6">
           {navItems.map((it) => {
