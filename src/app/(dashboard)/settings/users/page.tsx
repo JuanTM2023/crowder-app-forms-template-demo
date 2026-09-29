@@ -77,7 +77,7 @@ export default async function UsersPage({ searchParams }: Props) {
                 <td className="p-3"> 
                   {/* CORREGIDO: Se cambió <link> por <Link> */}
                   <Link href={`/settings/users/${user.id}`} className="text-blue-600 hover:underline">
-                    Ver detalles
+                    Editar
                   </Link> 
                 </td> 
               </tr> 
