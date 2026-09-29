@@ -73,6 +73,8 @@ export async function resetPasswordAction(
   const supabase =
     getServiceSupabase();
 
+    console.log("EMAIL:", user.email);
+
 const { error } =
   await supabase.auth.resetPasswordForEmail(
     user.email,
@@ -81,6 +83,8 @@ const { error } =
         "https://crowder-app-forms-template-demo-3m5.vercel.app/update-password",
     },
   );
+
+  console.log("ERROR:", error);
 
   if (error) {
     throw new Error(

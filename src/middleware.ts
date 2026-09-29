@@ -30,6 +30,14 @@ export async function middleware(request: NextRequest) {
   } = await time("auth.getUser", () => supabase.auth.getUser())
   total()
 
+  if (
+  request.nextUrl.pathname.startsWith(
+    "/updade-password",
+  )
+) {
+  return response
+}
+
   if (!user) {
     const url = request.nextUrl.clone()
     url.pathname = "/login"
@@ -40,5 +48,7 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/((?!api|embed|login|auth|_next|favicon.ico|.*\\..*).*)"],
+  matcher: [
+    "/((?!api|embed|login|auth|update-password|_next|favicon.ico|.*\\..*).*)",
+  ],
 }
