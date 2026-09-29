@@ -69,6 +69,7 @@ export async function resetPasswordAction(
       .toString(36)
       .slice(-10) + "!";
 
+const { data, error } =
   await supabase.auth.admin.updateUserById(
     id,
     {
@@ -76,10 +77,17 @@ export async function resetPasswordAction(
     },
   );
 
-  console.log(
-    "Nueva contraseña:",
-    password,
-  );
+console.log("RESET DATA:", data);
+console.log("RESET ERROR:", error);
+
+if (error) {
+  throw new Error(error.message);
+}
+
+console.log(
+  "Nueva contraseña:",
+  password,
+);
 
   redirect(
     `/settings/users/${id}?password=${encodeURIComponent(password)}`
