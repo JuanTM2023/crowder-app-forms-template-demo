@@ -63,6 +63,13 @@ export default async function NewUserPage() {
           />
 
           <input
+  name="password"
+  type="password"
+  placeholder="Contraseña temporal"
+  className="w-full rounded-xl border border-border bg-white px-4 py-3 text-black"
+/>
+
+          <input
             name="phone"
             placeholder="Teléfono"
             className="w-full rounded-xl border border-border background-white px-4 py-3 text-black"
