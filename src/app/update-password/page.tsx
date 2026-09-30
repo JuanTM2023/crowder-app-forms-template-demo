@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { createClient } from "@supabase/supabase-js";
 
 export default function UpdatePasswordPage() {
@@ -9,6 +9,22 @@ export default function UpdatePasswordPage() {
     useState("");
   const [message, setMessage] =
     useState("");
+
+  useEffect(() => {
+  const supabase = createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+  );
+
+  supabase.auth
+    .getSession()
+    .then(({ data }) => {
+      console.log(
+        "SESSION:",
+        data.session,
+      );
+    });
+}, []);  
 
   async function handleSubmit(
     e: React.FormEvent,

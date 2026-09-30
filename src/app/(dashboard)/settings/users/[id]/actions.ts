@@ -80,7 +80,7 @@ const { error } =
     user.email,
     {
 redirectTo:
-  "https://crowder-app-forms-template-demo-3m5.vercel.app/auth/callback?next=/update-password"
+"https://crowder-app-forms-template-demo-3m5.vercel.app/update-password"
     },
   );
 
