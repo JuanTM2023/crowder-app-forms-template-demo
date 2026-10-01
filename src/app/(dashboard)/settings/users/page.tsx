@@ -1,5 +1,8 @@
-import { db } from "@/lib/db"; 
-import Link from "next/link"; 
+import Link from "next/link";
+import { db } from "@/lib/db";
+import { internalUsers, producers } from "@/lib/db/schema";
+import { eq } from "drizzle-orm";
+
 
 export const dynamic = "force-dynamic"; 
 
@@ -12,7 +15,27 @@ export default async function UsersPage({ searchParams }: Props) {
   const { q = "" } = await searchParams; 
 
   // 2. Traemos los usuarios de la base de datos
-  const users = await db.query.internalUsers.findMany(); 
+const users = await db
+  .select({
+    id: internalUsers.id,
+    fullName: internalUsers.fullName,
+    documentType: internalUsers.documentType,
+    documentNumber: internalUsers.documentNumber,
+    email: internalUsers.email,
+    phone: internalUsers.phone,
+    birthDate: internalUsers.birthDate,
+    role: internalUsers.role,
+    active: internalUsers.active,
+    producerName: producers.razon_social,
+  })
+  .from(internalUsers)
+  .leftJoin(
+    producers,
+    eq(
+      internalUsers.producerId,
+      producers.id,
+    ),
+  );
 
   // 3. Filtramos los usuarios basados en la query de búsqueda
   const filteredUsers = users.filter( 
@@ -72,7 +95,7 @@ export default async function UsersPage({ searchParams }: Props) {
                   {user.birthDate ? new Date(user.birthDate).toLocaleDateString() : "-"} 
                 </td> 
                 <td className="p-3"> {user.role} </td> 
-                <td className="p-3"> {user.producerCode ?? "-"} </td> 
+                <td className="p-3"> {user.producerName ?? "-"} </td>
                 <td className="p-3"> {user.active ? "Activo" : "Inactivo"} </td> 
                 <td className="p-3"> 
                   {/* CORREGIDO: Se cambió <link> por <Link> */}
