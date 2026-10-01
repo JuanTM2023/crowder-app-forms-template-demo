@@ -218,6 +218,9 @@ export const internalUsers = pgTable("internal_users", {
 
   role: text("role")
     .notNull(),
+    
+  producerId: uuid("producer_id")
+  .references(() => producers.id),  
 
   producerCode: text("producer_code"),
 

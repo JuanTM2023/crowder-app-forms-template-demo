@@ -88,8 +88,8 @@ export default async function EditUserPage({
         </select>
         
         <select
-          name="producerCode"
-          defaultValue={user.producerCode ?? ""}
+          name="producerId"
+          defaultValue={user.producerId ?? ""}
           className="w-full rounded-xl border border-border bg-white px-4 py-3 text-black"
         >
           <option value="">Sin Productora</option>

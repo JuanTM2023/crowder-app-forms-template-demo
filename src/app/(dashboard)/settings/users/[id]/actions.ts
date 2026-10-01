@@ -12,44 +12,44 @@ export async function updateUserAction(
   const id =
     formData.get("id") as string;
 
+  const role =
+  formData.get("role") as string;
+
+const producerId =
+  (formData.get("producerId") as string) || null;
+
+if (
+  role !== "ADMIN" &&
+  !producerId
+) {
+  throw new Error(
+    "Debe seleccionar una productora para este usuario",
+  );
+}  
+
   await db
     .update(internalUsers)
-    .set({
-      fullName:
-        formData.get(
-          "fullName",
-        ) as string,
+.set({
+  fullName:
+    formData.get("fullName") as string,
 
-      email:
-        formData.get(
-          "email",
-        ) as string,
+  email:
+    formData.get("email") as string,
 
-      documentNumber:
-        formData.get(
-          "documentNumber",
-        ) as string,
+  documentNumber:
+    formData.get("documentNumber") as string,
 
-      phone:
-        (formData.get(
-          "phone",
-        ) as string) || null,
+  phone:
+    (formData.get("phone") as string) || null,
 
-      role:
-        formData.get(
-          "role",
-        ) as string,
+  role,
 
-      producerCode:
-        (formData.get(
-          "producerCode",
-        ) as string) || null,
+  producerId,
 
-      active:
-        formData.get(
-          "active",
-        ) === "true",
-    })
+  active:
+    formData.get("active") === "true",
+})
+
     .where(eq(internalUsers.id, id));
 
   redirect("/settings/users");

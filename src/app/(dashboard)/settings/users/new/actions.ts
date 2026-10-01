@@ -18,12 +18,28 @@ const email =
 const password =
   formData.get("password") as string;
 
+const role =
+  formData.get("role") as string;
+
+const producerId =
+  (formData.get("producerId") as string) || null;  
+
+if (
+  role !== "ADMIN" &&
+  !producerId
+) {
+  throw new Error(
+    "Debe seleccionar una productora para este usuario",
+  );
+}
+  
+
 const { data, error } =
   await supabase.auth.admin.createUser({
     email,
     password,
     email_confirm: true,
-  });
+  });  
 
 if (error) {
   throw new Error(error.message);
@@ -32,6 +48,7 @@ if (error) {
 if (!data.user) {
   throw new Error("No se pudo crear el usuario en Authentication");
 }
+
 
   await db.insert(internalUsers).values({
     id: data.user.id,
@@ -60,8 +77,8 @@ if (!data.user) {
     role:
       formData.get("role") as string,
 
-    producerCode:
-      (formData.get("producerCode") as string) || null,
+    producerId:
+      (formData.get("producerId") as string) || null,
 
     active: true,
   });

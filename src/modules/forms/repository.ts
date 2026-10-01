@@ -36,6 +36,7 @@ export type FormListRow = {
 export type FormListFilters = {
   search?: string;
   status?: "published" | "draft" | "archived";
+  producerId?: string;
   limit?: number;
   offset?: number;
 };
@@ -45,6 +46,13 @@ export type FormListStatus = NonNullable<FormListFilters["status"]>;
 function buildFormListWhere(filters: FormListFilters) {
   // Los soft-deleted nunca aparecen en el listado ni en el conteo.
   const conds = [sql`f.deleted_at is null`];
+
+  if (filters.producerId) {
+  conds.push(
+    sql`f.producer_id = ${filters.producerId}`
+  );
+}
+
   if (filters.search) {
     const like = `%${filters.search}%`;
     conds.push(sql`(f.title ilike ${like} or f.id ilike ${like})`);
