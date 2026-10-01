@@ -2,8 +2,9 @@
 
 import { redirect } from "next/navigation";
 import { db } from "@/lib/db";
-import { internalUsers } from "@/lib/db/schema";
+import { internalUsers, producers } from "@/lib/db/schema";
 import { getServiceSupabase } from "@/adapters/supabase/server";
+import { eq } from "drizzle-orm";
 
 export async function createUserAction(
   formData: FormData,
@@ -22,7 +23,22 @@ const role =
   formData.get("role") as string;
 
 const producerId =
-  (formData.get("producerId") as string) || null;  
+  (formData.get("producerId") as string) || null;
+
+let producerCode = null;
+
+if (producerId) {
+  const producer =
+    await db.query.producers.findFirst({
+      where: eq(
+        producers.id,
+        producerId,
+      ),
+    });
+
+  producerCode =
+    producer?.razon_social ?? null;
+}
 
 if (
   role !== "ADMIN" &&
@@ -74,11 +90,10 @@ if (!data.user) {
           )
         : null,
 
-    role:
-      formData.get("role") as string,
+    role,
 
-    producerId:
-      (formData.get("producerId") as string) || null,
+    producerId,
+    producerCode,
 
     active: true,
   });

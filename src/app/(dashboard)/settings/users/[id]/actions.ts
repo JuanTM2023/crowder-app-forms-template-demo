@@ -1,10 +1,11 @@
 "use server";
 
 import { db } from "@/lib/db";
-import { internalUsers } from "@/lib/db/schema";
+import { internalUsers, producers } from "@/lib/db/schema";
 import { eq } from "drizzle-orm";
 import { redirect } from "next/navigation";
 import { getServiceSupabase } from "@/adapters/supabase/server";
+
 
 export async function updateUserAction(
   formData: FormData,
@@ -17,6 +18,21 @@ export async function updateUserAction(
 
 const producerId =
   (formData.get("producerId") as string) || null;
+
+let producerCode = null;
+
+if (producerId) {
+  const producer =
+    await db.query.producers.findFirst({
+      where: eq(
+        producers.id,
+        producerId,
+      ),
+    });
+
+  producerCode =
+    producer?.razon_social ?? null;
+}
 
 if (
   role !== "ADMIN" &&
@@ -45,6 +61,7 @@ if (
   role,
 
   producerId,
+  producerCode,
 
   active:
     formData.get("active") === "true",

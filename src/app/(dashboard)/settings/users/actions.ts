@@ -2,11 +2,31 @@
 
 import { redirect } from "next/navigation";
 import { db } from "@/lib/db";
-import { internalUsers } from "@/lib/db/schema";
+import { internalUsers, producers } from "@/lib/db/schema";
+import { eq } from "drizzle-orm";
 
 export async function createUserAction(
   formData: FormData,
 ) {
+
+  const producerId =
+  (formData.get("producerId") as string) || null;
+
+let producerCode = null;
+
+if (producerId) {
+  const producer =
+    await db.query.producers.findFirst({
+      where: eq(
+        producers.id,
+        producerId,
+      ),
+    });
+
+  producerCode =
+    producer?.razon_social ?? null;
+}
+
   await db.insert(internalUsers).values({
     fullName:
       formData.get("fullName") as string,
@@ -33,8 +53,8 @@ export async function createUserAction(
     role:
       formData.get("role") as string,
 
-    producerCode:
-      formData.get("producerCode") as string,
+    producerId,
+    producerCode,
 
     active: true,
   });
