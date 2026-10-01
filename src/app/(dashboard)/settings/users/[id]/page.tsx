@@ -87,18 +87,24 @@ export default async function EditUserPage({
           <option value="OPERARIO">OPERARIO</option>
         </select>
         
-        <select
-          name="producerId"
-          defaultValue={user.producerId ?? ""}
-          className="w-full rounded-xl border border-border bg-white px-4 py-3 text-black"
-        >
-          <option value="">Sin Productora</option>
-          {producerList.map((producer) => (
-            <option key={producer.id} value={producer.razon_social}>
-              {producer.razon_social}
-            </option>
-          ))}
-        </select>
+<select
+  name="producerId"
+  defaultValue={user.producerId ?? ""}
+  className="w-full rounded-xl border border-border bg-white px-4 py-3 text-black"
+>
+  <option value="">
+    Sin Productora
+  </option>
+
+  {producerList.map((producer) => (
+    <option
+      key={producer.id}
+      value={producer.id}
+    >
+      {producer.razon_social}
+    </option>
+  ))}
+</select>
         
         <select
           name="active"
