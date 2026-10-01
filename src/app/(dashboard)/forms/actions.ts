@@ -30,10 +30,13 @@ export async function createFormAction(
   formData: FormData,
 ): Promise<ActionResult> {
   await requireUser();
-  const parsed = newFormSchema.safeParse({
-    title: formData.get("title"),
-    producerId: formData.get("producer_id"),
-  });
+const producerId =
+  (formData.get("producer_id") as string)?.trim() || undefined;
+
+const parsed = newFormSchema.safeParse({
+  title: formData.get("title"),
+  producerId,
+});
   if (!parsed.success) {
     return {
       ok: false,
